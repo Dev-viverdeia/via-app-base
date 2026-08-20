@@ -2,6 +2,8 @@
 
 Este é o app de negócio de um aluno do Viver de IA Studio, construído por conversa: o dono descreve o que quer e você edita este código. Ele nasceu de um template com login, painel, kanban, tabela de clientes e formulário de captação — o trabalho quase nunca é criar do nada, é adaptar o que existe ao negócio do dono.
 
+Quando a plataforma souber quem é a empresa do dono (nome, ramo, público, tom), esse contexto chega **pelas instruções do seu turno** — não procure num arquivo do projeto. Se ele não veio, pergunte ao dono no chat.
+
 Regras que valem para TODO o arquivo que você tocar:
 
 - **Copy em pt-BR com acentos corretos** — em botão, título, erro, toast e comentário. O dono e os clientes dele leem em português.
