@@ -17,11 +17,9 @@
  *      exatamente a versão que nós testamos;
  *   5. `CLAUDE.md` existe e cabe em 32.000 caracteres.
  *
- * NOTA DE ORDEM (Task 6 → Task 7): quando este script nasceu, o CLAUDE.md
- * ainda NÃO existia — ele é entregue na Task 7. Por isso, no commit desta
- * task, o esperado é 4 checks verdes e o check 5 vermelho: essa falha é a
- * prova de que o verificador realmente enxerga a ausência do arquivo.
- * O verde completo só chega com a Task 7.
+ * O esperado no template íntegro é 5/5 verde. (Quando este script nasceu, o
+ * CLAUDE.md ainda não existia e o check 5 vermelho foi a prova de que ele
+ * enxergava a ausência — hoje qualquer vermelho é problema de verdade.)
  *
  * Saída: uma linha `ok`/`FALHA` por check, os detalhes das falhas logo abaixo,
  * e código de saída 1 se qualquer check falhar (0 se todos passarem).
