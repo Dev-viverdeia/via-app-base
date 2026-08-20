@@ -24,7 +24,7 @@ Regras que valem para TODO o arquivo que você tocar:
 - **Cada entrada ocupa exatamente uma linha.** Nunca quebre uma entrada em várias linhas, nunca ponha duas na mesma. A plataforma corta telas removendo linhas deste bloco — entrada fora do padrão quebra esse mecanismo.
 - `protegida: true` = a página exige login e renderiza dentro do AppShell (sidebar/barra). `protegida: false` = página pública e **standalone** (sem shell — ela desenha o próprio `<main>`, como `login` e `captacao`).
 - `naNavbar: false` tira a página da navegação sem tirá-la do ar.
-- **Helpers ficam FORA de `src/pages/`** (em `src/lib/` ou junto do componente que os usa). O verificador trata qualquer pasta de `src/pages/` como página e vai acusar pasta órfã.
+- **PASTA nova dentro de `src/pages/` é sempre uma página** — o verificador cobra a bijeção pasta ↔ registro e acusa pasta órfã. Já **ARQUIVO auxiliar de uma tela** pode morar ao lado do componente dela (é o que `src/pages/tabela/` faz) ou em `src/lib/` quando serve a mais de uma tela.
 
 Depois de mexer no registro, no `package.json` ou em `CLAUDE.md`, o dono pode rodar `npm run verificar` — mensagens de erro dizem o que quebrou e como consertar. Não edite `scripts/verificar.mjs`.
 

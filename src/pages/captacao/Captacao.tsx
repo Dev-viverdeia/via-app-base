@@ -80,9 +80,11 @@ export default function Captacao() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
-      <p className="text-2xl font-bold tracking-tight text-marca">
+      {/* Página standalone: o `<h1>` do documento é este — não há PageHeader
+          aqui para trazê-lo. */}
+      <h1 className="text-2xl font-bold tracking-tight text-marca">
         {NOME_DO_APP}
-      </p>
+      </h1>
 
       {enviadoPor ? (
         /* --- Tela de obrigado ------------------------------------------ */

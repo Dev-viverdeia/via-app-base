@@ -12,6 +12,7 @@ import {
 } from "@supabase/supabase-js";
 import { NOME_DO_APP } from "../../components/layout/AppShell.tsx";
 import { Button } from "../../components/ui/button.tsx";
+import { CampoDeTexto } from "../../components/ui/campo-de-texto.tsx";
 import {
   Card,
   CardContent,
@@ -19,8 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card.tsx";
-import { Input } from "../../components/ui/input.tsx";
-import { Label } from "../../components/ui/label.tsx";
 import {
   Tabs,
   TabsContent,
@@ -206,11 +205,17 @@ export default function Login() {
     navegar(destino, { replace: true });
   }
 
+  // A senha do cadastro mostra dica OU erro no mesmo lugar, então a mensagem
+  // sai numa variável só: é ela que decide as duas props do campo.
+  const erroDaSenhaNova = formCriarConta.formState.errors.senha?.message;
+
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
-      <p className="text-2xl font-bold tracking-tight text-marca">
+      {/* Página standalone: o `<h1>` do documento é este — não há PageHeader
+          aqui para trazê-lo. */}
+      <h1 className="text-2xl font-bold tracking-tight text-marca">
         {NOME_DO_APP}
-      </p>
+      </h1>
 
       <Card className="w-full max-w-sm">
         <CardHeader>
@@ -244,48 +249,22 @@ export default function Login() {
                   </p>
                 ) : null}
 
-                <div className="grid gap-2">
-                  <Label htmlFor="entrar-email">E-mail</Label>
-                  <Input
-                    {...formEntrar.register("email")}
-                    id="entrar-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="voce@email.com"
-                    aria-invalid={!!formEntrar.formState.errors.email}
-                    aria-describedby={
-                      formEntrar.formState.errors.email
-                        ? "entrar-email-erro"
-                        : undefined
-                    }
-                  />
-                  {formEntrar.formState.errors.email ? (
-                    <p id="entrar-email-erro" className="text-sm text-destrutivo">
-                      {formEntrar.formState.errors.email.message}
-                    </p>
-                  ) : null}
-                </div>
+                <CampoDeTexto
+                  rotulo="E-mail"
+                  {...formEntrar.register("email")}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="voce@email.com"
+                  erro={formEntrar.formState.errors.email?.message}
+                />
 
-                <div className="grid gap-2">
-                  <Label htmlFor="entrar-senha">Senha</Label>
-                  <Input
-                    {...formEntrar.register("senha")}
-                    id="entrar-senha"
-                    type="password"
-                    autoComplete="current-password"
-                    aria-invalid={!!formEntrar.formState.errors.senha}
-                    aria-describedby={
-                      formEntrar.formState.errors.senha
-                        ? "entrar-senha-erro"
-                        : undefined
-                    }
-                  />
-                  {formEntrar.formState.errors.senha ? (
-                    <p id="entrar-senha-erro" className="text-sm text-destrutivo">
-                      {formEntrar.formState.errors.senha.message}
-                    </p>
-                  ) : null}
-                </div>
+                <CampoDeTexto
+                  rotulo="Senha"
+                  {...formEntrar.register("senha")}
+                  type="password"
+                  autoComplete="current-password"
+                  erro={formEntrar.formState.errors.senha?.message}
+                />
 
                 <Button
                   type="submit"
@@ -320,58 +299,26 @@ export default function Login() {
                   </p>
                 ) : null}
 
-                <div className="grid gap-2">
-                  <Label htmlFor="criar-conta-email">E-mail</Label>
-                  <Input
-                    {...formCriarConta.register("email")}
-                    id="criar-conta-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="voce@email.com"
-                    aria-invalid={!!formCriarConta.formState.errors.email}
-                    aria-describedby={
-                      formCriarConta.formState.errors.email
-                        ? "criar-conta-email-erro"
-                        : undefined
-                    }
-                  />
-                  {formCriarConta.formState.errors.email ? (
-                    <p
-                      id="criar-conta-email-erro"
-                      className="text-sm text-destrutivo"
-                    >
-                      {formCriarConta.formState.errors.email.message}
-                    </p>
-                  ) : null}
-                </div>
+                <CampoDeTexto
+                  rotulo="E-mail"
+                  {...formCriarConta.register("email")}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="voce@email.com"
+                  erro={formCriarConta.formState.errors.email?.message}
+                />
 
-                <div className="grid gap-2">
-                  <Label htmlFor="criar-conta-senha">Senha</Label>
-                  <Input
-                    {...formCriarConta.register("senha")}
-                    id="criar-conta-senha"
-                    type="password"
-                    autoComplete="new-password"
-                    aria-invalid={!!formCriarConta.formState.errors.senha}
-                    aria-describedby={
-                      formCriarConta.formState.errors.senha
-                        ? "criar-conta-senha-erro"
-                        : "criar-conta-senha-dica"
-                    }
-                  />
-                  {formCriarConta.formState.errors.senha ? (
-                    <p
-                      id="criar-conta-senha-erro"
-                      className="text-sm text-destrutivo"
-                    >
-                      {formCriarConta.formState.errors.senha.message}
-                    </p>
-                  ) : (
-                    <p id="criar-conta-senha-dica" className="text-sm text-suave">
-                      Pelo menos 8 caracteres.
-                    </p>
-                  )}
-                </div>
+                {/* Dica e erro dividem o mesmo lugar: a regra da senha aparece
+                    enquanto ninguém errou, e some no instante em que o erro
+                    tem algo mais urgente a dizer. */}
+                <CampoDeTexto
+                  rotulo="Senha"
+                  {...formCriarConta.register("senha")}
+                  type="password"
+                  autoComplete="new-password"
+                  erro={erroDaSenhaNova}
+                  dica={erroDaSenhaNova ? undefined : "Pelo menos 8 caracteres."}
+                />
 
                 <Button
                   type="submit"

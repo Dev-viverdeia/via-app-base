@@ -34,7 +34,11 @@ export function CardHeader({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-/** Vira `<h3>`: o `<h1>` da tela é do PageHeader. */
+/**
+ * Vira `<h3>`, nunca o `<h1>` da tela: nas telas do app o `<h1>` vem do
+ * `PageHeader`; numa página standalone (login, captação) é a própria página
+ * que desenha o dela.
+ */
 export function CardTitle({ className, ...props }: ComponentProps<"h3">) {
   return (
     <h3

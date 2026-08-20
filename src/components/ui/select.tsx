@@ -16,7 +16,10 @@ import { cn } from "../../lib/utils.ts";
  *   </Select>
  *
  * Controlado: `value={status} onValueChange={setStatus}`.
- * Em formulário nativo/react-hook-form, use `name="status"` no `<Select>`.
+ * Com react-hook-form, ligue o Select pelo `<Controller>` (o exemplo pronto está
+ * em `src/pages/tabela/DialogDeCliente.tsx`) — ele não é um `<input>`, então
+ * `register()` nunca chega nele e o campo ficaria eternamente `undefined`;
+ * `name=` aqui serve só para o submit nativo de um `<form>` sem biblioteca.
  * Teclado, foco e `aria-expanded` vêm do Radix; `value` nunca pode ser "".
  */
 export const Select = SelectPrimitive.Root;

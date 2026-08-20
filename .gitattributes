@@ -1,0 +1,24 @@
+# Uma quebra de linha só, em toda máquina.
+#
+# O template é clonado no Windows (onde o git costuma vir com
+# `core.autocrlf=true`) e construído no Linux. Sem esta linha, o MESMO arquivo
+# chega ao disco com `\r\n` numa máquina e `\n` na outra: o diff aparece inteiro
+# quando ninguém mudou nada, o `\r` extra entra na conta de caracteres do
+# CLAUDE.md e cada script passa a precisar do seu próprio remendo de
+# normalização. `text=auto` deixa o git decidir o que é texto; `eol=lf` fixa a
+# quebra de linha no disco também, não só no que fica gravado.
+* text=auto eol=lf
+
+# Binário nenhum passa por conversão: um `\r` "consertado" dentro de uma imagem
+# ou de uma fonte é um arquivo corrompido.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.mp4 binary

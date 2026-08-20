@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { CSSProperties } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
@@ -87,8 +88,31 @@ export default function App() {
         </Routes>
         {/* Avisos do app (sonner). Um só, no topo, e DENTRO do roteador para
             que um aviso possa levar um <Link>. "system" segue o tema do
-            sistema, igual aos tokens. */}
-        <Toaster theme="system" />
+            sistema, igual aos tokens.
+
+            O sonner traz paleta própria (fundo branco fixo, cinza de borda) e
+            desenharia a superfície mais repetida do app fora da identidade —
+            por isso os três ganchos de cor dele (`--normal-bg`,
+            `--normal-border`, `--normal-text`) e o raio apontam para os tokens.
+            Rebrandear continua sendo editar UM arquivo.
+
+            `mobileOffset`: abaixo de 600px o aviso nasce embaixo, bem em cima
+            da barra de navegação do celular (ele vive num z-index altíssimo, a
+            barra não tem como ganhar). Subir o rodapé dele para 5rem deixa a
+            navegação sempre clicável. */}
+        <Toaster
+          theme="system"
+          style={
+            {
+              "--normal-bg": "var(--superficie)",
+              "--normal-border": "var(--borda)",
+              "--normal-text": "var(--tinta)",
+              "--border-radius": "var(--raio-m)",
+              fontFamily: "var(--fonte)",
+            } as CSSProperties
+          }
+          mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
+        />
       </BrowserRouter>
     </QueryClientProvider>
   );

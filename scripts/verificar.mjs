@@ -8,9 +8,10 @@
  * O que ele protege (as regras que o template inteiro assume como verdade):
  *   1. bijeção entre as pastas `src/pages/<id>` e as linhas `id: "<id>"`
  *      do registro, nas DUAS direções — nada de pasta órfã nem rota fantasma;
- *   2. cada página ocupa UMA linha entre os marcadores — o seletor de telas
- *      da plataforma apaga páginas removendo linha, então linha quebrada
- *      significa arquivo corrompido na mão do aluno;
+ *   2. cada página ocupa UMA linha entre os marcadores, no formato do template
+ *      (id entre aspas duplas) — o seletor de telas da plataforma apaga páginas
+ *      removendo linha, então linha quebrada significa arquivo corrompido na
+ *      mão do aluno;
  *   3. `build` do package.json é exatamente "vite build";
  *   4. nenhuma dependência em faixa (`^` ou `~`) — o preview precisa instalar
  *      exatamente a versão que nós testamos;
@@ -99,14 +100,29 @@ function saldoDeChaves(linha) {
 }
 
 /**
- * TODOS os ids `id: "…"` de uma linha, na ordem em que aparecem. É de propósito
- * que a busca seja global: duas entradas coladas na mesma linha passam pelas
+ * Um `id: <aspa>…<aspa>` de uma entrada. A CAPTURA aceita as três aspas do
+ * JavaScript (`"`, `'`, `` ` ``) porque as três fazem código que roda: se a
+ * busca só casasse `"…"`, uma linha `id: 'kanban'` sumiria dos olhos do check 1
+ * e ele acusaria `src/pages/kanban/` de pasta órfã — "ou apague a pasta", diria
+ * a mensagem, sobre uma tela que está no ar. Um erro merece um acusador só, e
+ * o dele é o check 2, que cobra a aspa dupla do template logo abaixo.
+ */
+const ID_DA_ENTRADA = /\bid\s*:\s*(["'`])([^"'`]*)\1/g;
+
+/**
+ * TODOS os ids de uma linha, na ordem em que aparecem. É de propósito que a
+ * busca seja global: duas entradas coladas na mesma linha passam pelas
  * checagens de chaves, e uma busca que parasse no primeiro id faria o check 1
  * jurar que a segunda página não está no registro — mentira que leva o aluno a
  * cadastrar de novo uma rota que já existe.
  */
 function idsDaLinha(codigo) {
-  return [...codigo.matchAll(/\bid\s*:\s*"([^"]*)"/g)].map((m) => m[1]);
+  return [...codigo.matchAll(ID_DA_ENTRADA)].map((m) => m[2]);
+}
+
+/** As aspas em que esses ids vieram, na mesma ordem — matéria do check 2. */
+function aspasDosIdsDaLinha(codigo) {
+  return [...codigo.matchAll(ID_DA_ENTRADA)].map((m) => m[1]);
 }
 
 /* ------------------------------------------------------------------ *
@@ -244,12 +260,29 @@ function acharLinhasMalformadas(bloco) {
         `${relativo(CAMINHO_REGISTRO)} linha ${numero}: as chaves \`{\` e \`}\` não fecham ` +
           `dentro da própria linha: \`${texto}\`. ` + comoConsertar,
       );
+      continue;
+    }
+
+    // Estilo, não estrago: `id: 'inicio'` roda igual. A cobrança mora aqui
+    // porque o check 1 aprendeu a enxergar o id em qualquer aspa — sem isso ele
+    // mandaria apagar a pasta de uma página que existe. Um erro, um acusador.
+    const forasteiras = aspasDosIdsDaLinha(codigo).filter((a) => a !== '"');
+    if (forasteiras.length > 0) {
+      const nome = forasteiras[0] === "'" ? "aspas simples" : "crases";
+      malformadas.set(
+        numero,
+        `${relativo(CAMINHO_REGISTRO)} linha ${numero}: o \`id\` veio entre ${nome}, ` +
+          `e o registro usa aspas duplas: \`${texto}\`. ` +
+          `Conserte: troque para \`id: "…"\`. O JavaScript aceita as duas, mas a plataforma ` +
+          `escreve e apaga estas linhas sozinha — um formato só é o que a mantém trabalhando ` +
+          `sobre texto previsível.`,
+      );
     }
   }
   return malformadas;
 }
 
-/** Check 2 — cada entrada em UMA linha. */
+/** Check 2 — cada entrada em UMA linha, no formato do registro. */
 function checarUmaLinhaPorPagina(bloco, malformadas) {
   if (bloco.erro) return [bloco.erro];
   return [...malformadas.values()];
@@ -446,7 +479,7 @@ const malformadas = bloco.erro ? new Map() : acharLinhasMalformadas(bloco);
 
 const checks = [
   { nome: "registro ↔ pastas em src/pages (bijeção)", erros: checarBijecaoRegistroPastas(bloco, malformadas) },
-  { nome: "uma linha por página no registro", erros: checarUmaLinhaPorPagina(bloco, malformadas) },
+  { nome: "uma linha por página, no formato do registro", erros: checarUmaLinhaPorPagina(bloco, malformadas) },
   { nome: 'script de build === "vite build"', erros: checarScriptDeBuild(pkg) },
   { nome: "dependências em versão exata (sem ^ ou ~)", erros: checarVersoesExatas(pkg) },
   { nome: `CLAUDE.md existe e cabe em ${LIMITE_CLAUDE_MD.toLocaleString("pt-BR")} caracteres`, erros: checarClaudeMd() },
