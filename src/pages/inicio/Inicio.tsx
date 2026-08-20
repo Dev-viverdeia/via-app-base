@@ -214,7 +214,7 @@ export default function Inicio() {
               icone={Inbox}
               titulo="Nenhum cliente ainda"
               descricao="Cadastre o primeiro cliente para começar a acompanhar as vendas."
-              acao={
+              acoes={
                 <Button>
                   <Plus />
                   Novo cliente

@@ -58,7 +58,7 @@ export function SelectContent({
       <SelectPrimitive.Content
         position={position}
         className={cn(
-          "relative z-50 max-h-64 min-w-32 overflow-hidden rounded-m border border-borda bg-superficie text-tinta shadow-g",
+          "relative z-50 max-h-[var(--radix-select-content-available-height)] min-w-32 overflow-x-hidden overflow-y-auto rounded-m border border-borda bg-superficie text-tinta shadow-g",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
           className,

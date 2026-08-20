@@ -10,11 +10,11 @@ import { cn } from "../../lib/utils.ts";
  *     icone={Users}
  *     titulo="Nenhum cliente ainda"
  *     descricao="Cadastre o primeiro cliente para começar a acompanhar as vendas."
- *     acao={<Button onClick={abrirDialogo}>Novo cliente</Button>}
+ *     acoes={<Button onClick={abrirDialogo}>Novo cliente</Button>}
  *   />
  *
  * Atenção: as propriedades são em português (`icone`, `titulo`, `descricao`,
- * `acao`) — este componente é nosso, não é do shadcn. `icone` recebe o
+ * `acoes`) — este componente é nosso, não é do shadcn. `icone` recebe o
  * componente do lucide-react SEM renderizar: `icone={Users}`, não `<Users />`.
  */
 type EmptyStateProps = {
@@ -24,8 +24,8 @@ type EmptyStateProps = {
   titulo: string;
   /** Uma linha explicando como sair do vazio. */
   descricao: string;
-  /** Opcional: o botão que resolve (ex.: "Novo cliente"). */
-  acao?: ReactNode;
+  /** Opcional: o botão (ou os botões) que resolvem (ex.: "Novo cliente"). */
+  acoes?: ReactNode;
   className?: string;
 };
 
@@ -33,7 +33,7 @@ export function EmptyState({
   icone: Icone,
   titulo,
   descricao,
-  acao,
+  acoes,
   className,
 }: EmptyStateProps) {
   return (
@@ -50,7 +50,7 @@ export function EmptyState({
         {titulo}
       </h3>
       <p className="max-w-sm text-sm text-pretty text-suave">{descricao}</p>
-      {acao ? <div className="mt-3 flex flex-wrap gap-2">{acao}</div> : null}
+      {acoes ? <div className="mt-3 flex flex-wrap gap-2">{acoes}</div> : null}
     </div>
   );
 }

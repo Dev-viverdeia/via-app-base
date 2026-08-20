@@ -40,7 +40,7 @@ function DialogOverlay({
 }: ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
-      className={cn("fixed inset-0 z-50 bg-fundo/80 backdrop-blur-sm", className)}
+      className={cn("fixed inset-0 z-50 bg-sobreposicao", className)}
       {...props}
     />
   );

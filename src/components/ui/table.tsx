@@ -24,7 +24,12 @@ import { cn } from "../../lib/utils.ts";
  */
 export function Table({ className, ...props }: ComponentProps<"table">) {
   return (
-    <div className="w-full overflow-x-auto">
+    <div
+      className="w-full overflow-x-auto"
+      role="region"
+      tabIndex={0}
+      aria-label="Tabela com rolagem horizontal"
+    >
       <table
         className={cn("w-full caption-bottom text-sm text-tinta", className)}
         {...props}

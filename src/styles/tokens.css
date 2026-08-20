@@ -26,6 +26,8 @@
   --positivo: #15803d;
   --atencao: #b45309;
   --destrutivo: #dc2626;
+  /* Véu que escurece a página atrás do modal — precisa ser mais escuro que o fundo. */
+  --sobreposicao: rgb(11 18 32 / 0.45);
 
   /* --- Raios (cantos arredondados) --------------------------------------- */
   --raio-p: 0.5rem; /* input, badge, botão pequeno */
@@ -58,6 +60,7 @@
     --positivo: #4ade80;
     --atencao: #fbbf24;
     --destrutivo: #f87171;
+    --sobreposicao: rgb(0 0 0 / 0.6);
 
     --sombra-p: 0 1px 2px rgb(0 0 0 / 0.5);
     --sombra-m: 0 8px 24px -8px rgb(0 0 0 / 0.6);
@@ -82,6 +85,7 @@
   --color-positivo: var(--positivo);
   --color-atencao: var(--atencao);
   --color-destrutivo: var(--destrutivo);
+  --color-sobreposicao: var(--sobreposicao);
 
   --radius-p: var(--raio-p);
   --radius-m: var(--raio-m);

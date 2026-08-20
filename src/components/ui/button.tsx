@@ -13,6 +13,10 @@ import { cn } from "../../lib/utils.ts";
  * Para um LINK com cara de botão, use as classes direto (não existe `asChild`):
  *   <Link to="/tabela" className={buttonVariants({ variant: "outline" })}>Ver</Link>
  *
+ * O padrão é `type="button"`, então um botão solto DENTRO de um `<form>` nunca
+ * envia o formulário sem querer. O botão que envia precisa dizer isso:
+ *   <Button type="submit">Salvar</Button>
+ *
  * O anel de foco vem do `:focus-visible` global (globals.css) — não repita aqui.
  * Precisa de um estilo novo? Acrescente uma variante abaixo em vez de escrever
  * classes de cor soltas na tela.
@@ -60,6 +64,7 @@ export type ButtonProps = ComponentProps<"button"> &
 export function Button({ className, variant, size, ...props }: ButtonProps) {
   return (
     <button
+      type="button"
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
