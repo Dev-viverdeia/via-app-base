@@ -98,6 +98,17 @@ function saldoDeChaves(linha) {
   return saldo;
 }
 
+/**
+ * TODOS os ids `id: "…"` de uma linha, na ordem em que aparecem. É de propósito
+ * que a busca seja global: duas entradas coladas na mesma linha passam pelas
+ * checagens de chaves, e uma busca que parasse no primeiro id faria o check 1
+ * jurar que a segunda página não está no registro — mentira que leva o aluno a
+ * cadastrar de novo uma rota que já existe.
+ */
+function idsDaLinha(codigo) {
+  return [...codigo.matchAll(/\bid\s*:\s*"([^"]*)"/g)].map((m) => m[1]);
+}
+
 /* ------------------------------------------------------------------ *
  * Leitura do registro: acha os marcadores e separa as linhas de dentro.
  * ------------------------------------------------------------------ */
@@ -121,8 +132,34 @@ function lerBlocoDoRegistro() {
   }
 
   const todas = fonte.split(/\r?\n/);
-  const iAbre = todas.findIndex((l) => l.trim() === MARCADOR_ABRE);
-  const iFecha = todas.findIndex((l) => l.trim() === MARCADOR_FECHA);
+  // Guardamos TODAS as ocorrências de cada marcador, não só a primeira: marcador
+  // repetido é exatamente o estrago que este script existe para pegar (a plataforma
+  // insere e remove linhas entre o primeiro par, e o segundo par vira zona morta).
+  const linhasAbre = [];
+  const linhasFecha = [];
+  todas.forEach((l, i) => {
+    const t = l.trim();
+    if (t === MARCADOR_ABRE) linhasAbre.push(i + 1);
+    else if (t === MARCADOR_FECHA) linhasFecha.push(i + 1);
+  });
+
+  // Repetição vem antes da checagem do par porque é o diagnóstico mais preciso:
+  // com um marcador a mais, o par que o script acha pode até parecer válido.
+  const repetido = linhasAbre.length > 1 ? MARCADOR_ABRE : linhasFecha.length > 1 ? MARCADOR_FECHA : null;
+  if (repetido !== null) {
+    const numeros = repetido === MARCADOR_ABRE ? linhasAbre : linhasFecha;
+    return {
+      erro:
+        `${relativo(CAMINHO_REGISTRO)}: o marcador \`${repetido}\` aparece ${numeros.length} vezes ` +
+        `(linhas ${numeros.join(", ")}) — ele precisa ser único no arquivo. ` +
+        `Conserte: deixe UM \`${MARCADOR_ABRE}\` e UM \`${MARCADOR_FECHA}\`, com todas as páginas ` +
+        `entre eles, e apague os marcadores repetidos. A plataforma trabalha sempre no primeiro par: ` +
+        `tudo que estiver no par de baixo vira código que nenhum check enxerga e ninguém mantém.`,
+    };
+  }
+
+  const iAbre = linhasAbre.length > 0 ? linhasAbre[0] - 1 : -1;
+  const iFecha = linhasFecha.length > 0 ? linhasFecha[0] - 1 : -1;
 
   if (iAbre === -1 || iFecha === -1 || iFecha < iAbre) {
     return {
@@ -165,6 +202,24 @@ function acharLinhasMalformadas(bloco) {
     `entrada partida em várias linhas quebra esse mecanismo.`;
 
   for (const { numero, texto, codigo } of bloco.linhas) {
+    // Duas entradas coladas numa linha só: o diagnóstico mais específico vem
+    // primeiro, porque ele explica sozinho qualquer estranheza de chaves.
+    const ids = idsDaLinha(codigo);
+    if (ids.length > 1) {
+      malformadas.set(
+        numero,
+        `${relativo(CAMINHO_REGISTRO)} linha ${numero}: ${ids.length === 2 ? "duas" : ids.length} entradas ` +
+          `na mesma linha (ids ${ids.map((id) => `"${id}"`).join(", ")}) — ` +
+          `separe em uma linha por entrada: \`${texto}\`. ` +
+          // Aqui o conserto é o inverso do das outras falhas (quebrar, não juntar),
+          // então a linha tem mensagem própria em vez do `comoConsertar` comum.
+          `Conserte: parta esta linha em ${ids.length}, uma entrada por linha, cada uma no formato ` +
+          `\`{ id: "…", titulo: "…", rota: "…", icone: …, pagina: lazy(() => import("./pages/…/…")), naNavbar: …, protegida: … },\`. ` +
+          `A plataforma apaga uma tela removendo a linha inteira: com ${ids.length === 2 ? "duas" : ids.length} entradas ` +
+          `grudadas, apagar uma leva ${ids.length === 2 ? "a outra" : "as outras"} junto.`,
+      );
+      continue;
+    }
     if (!codigo.startsWith("{")) {
       malformadas.set(
         numero,
@@ -206,14 +261,15 @@ function checarBijecaoRegistroPastas(bloco, malformadas) {
 
   const erros = [];
 
-  // Lado do registro: um id por linha de entrada. O id é colhido de TODA linha
-  // que tenha `id: "…"`, inclusive de uma entrada quebrada em várias linhas —
-  // senão o check 1 acusaria "pasta órfã" por um estrago que é do check 2.
-  // Só a reclamação de "entrada sem id" é que fica calada nessas linhas.
+  // Lado do registro: os ids são colhidos de TODA linha que tenha `id: "…"` —
+  // inclusive de uma entrada quebrada em várias linhas e de uma linha com duas
+  // entradas coladas (daí `idsDaLinha` ser global). Senão o check 1 acusaria
+  // "pasta órfã" por um estrago que é do check 2. Só a reclamação de "entrada
+  // sem id" é que fica calada nas linhas que o check 2 já domina.
   const idsPorLinha = new Map(); // id -> [numeros de linha]
   for (const { numero, texto, codigo } of bloco.linhas) {
-    const achado = /\bid\s*:\s*"([^"]*)"/.exec(codigo);
-    if (!achado) {
+    const ids = idsDaLinha(codigo);
+    if (ids.length === 0) {
       if (malformadas.has(numero)) continue; // quem cobra o conserto é o check 2
       erros.push(
         `${relativo(CAMINHO_REGISTRO)} linha ${numero}: entrada sem \`id: "…"\`: \`${texto}\`. ` +
@@ -222,9 +278,10 @@ function checarBijecaoRegistroPastas(bloco, malformadas) {
       );
       continue;
     }
-    const id = achado[1];
-    if (!idsPorLinha.has(id)) idsPorLinha.set(id, []);
-    idsPorLinha.get(id).push(numero);
+    for (const id of ids) {
+      if (!idsPorLinha.has(id)) idsPorLinha.set(id, []);
+      idsPorLinha.get(id).push(numero);
+    }
   }
 
   for (const [id, numeros] of idsPorLinha) {
@@ -254,12 +311,15 @@ function checarBijecaoRegistroPastas(bloco, malformadas) {
   const conjuntoPastas = new Set(pastas);
 
   // Direção 1: registro → disco.
-  for (const id of idsPorLinha.keys()) {
+  for (const [id, numeros] of idsPorLinha) {
     if (!conjuntoPastas.has(id)) {
+      const onde = `${numeros.length === 1 ? "linha" : "linhas"} ${numeros.join(", ")}`;
       erros.push(
-        `o id "${id}" está no registro mas a pasta \`src/pages/${id}/\` não existe. ` +
-          `Conserte: ou crie \`src/pages/${id}/\` com o componente da tela, ou remova a linha ` +
-          `do id "${id}" de ${relativo(CAMINHO_REGISTRO)}. Do jeito que está, a rota carrega e quebra.`,
+        `o id "${id}" está no registro (${relativo(CAMINHO_REGISTRO)} ${onde}) mas a pasta ` +
+          `\`src/pages/${id}/\` não existe. ` +
+          `Conserte: ou crie \`src/pages/${id}/\` com o componente da tela, ou remova ` +
+          `${numeros.length === 1 ? "essa linha" : "essas linhas"} de ${relativo(CAMINHO_REGISTRO)}. ` +
+          `Do jeito que está, a rota carrega e quebra.`,
       );
     }
   }
@@ -355,7 +415,15 @@ function checarClaudeMd() {
     ];
   }
 
-  const caracteres = conteudo.length;
+  // Normalizamos antes de contar para que o mesmo arquivo meça o mesmo em toda
+  // máquina: com `core.autocrlf` (padrão no Windows) e sem `.gitattributes`, o
+  // checkout troca cada `\n` por `\r\n` e o `\r` extra inflaria a conta — o
+  // mesmo CLAUDE.md daria 32.000 no Linux e 32.799 no Windows, e o verde ou
+  // vermelho do check dependeria de quem rodou. O BOM inicial, pelo mesmo
+  // motivo, é marca de codificação e não conteúdo.
+  const normalizado = conteudo.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
+
+  const caracteres = normalizado.length;
   if (caracteres > LIMITE_CLAUDE_MD) {
     return [
       `CLAUDE.md tem ${caracteres.toLocaleString("pt-BR")} caracteres, acima do limite de ` +
