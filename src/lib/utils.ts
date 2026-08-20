@@ -22,3 +22,13 @@ const FORMATO_EM_REAIS = new Intl.NumberFormat("pt-BR", {
 export function emReais(valor: number): string {
   return FORMATO_EM_REAIS.format(valor);
 }
+
+/**
+ * Id de item criado na tela ("novo-1", "novo-2"…). Existe só enquanto a lista
+ * é em memória: com banco de verdade, quem gera o id é o banco.
+ */
+let sequencia = 0;
+export function novoId(): string {
+  sequencia += 1;
+  return `novo-${sequencia}`;
+}

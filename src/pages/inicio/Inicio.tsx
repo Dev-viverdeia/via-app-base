@@ -3,8 +3,10 @@
  *
  * ONDE PLUGAR DADOS REAIS: tudo o que aparece aqui vem de
  * `src/data/demo/indicadores.ts` (`RESUMO`, `FATURAMENTO_POR_DIA`,
- * `ATIVIDADES`). Troque aquele arquivo por consultas ao seu banco mantendo os
- * mesmos formatos e esta tela continua funcionando sem uma linha de mudança.
+ * `ATIVIDADES`) e a lista `INDICADORES` lá embaixo é montada na hora em que o
+ * módulo carrega — ao trocar por consultas ao banco, mova essa montagem para
+ * dentro do componente (`useQuery`) e desenhe os estados de carregando e de
+ * erro, porque o dado deixa de estar pronto antes da primeira pintura.
  */
 import {
   Activity,

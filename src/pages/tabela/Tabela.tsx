@@ -2,82 +2,52 @@
  * CLIENTES — a tabela com busca, ordenação e o cadastro completo (criar,
  * editar, excluir).
  *
+ * Esta tela guarda a lista e manda nela; as peças que só desenham moram ao
+ * lado: `LinhaDeCliente.tsx`, `DialogDeCliente.tsx` (com as regras do
+ * formulário), `ConfirmacaoDeExclusao.tsx` e `status.ts`.
+ *
  * ONDE PLUGAR DADOS REAIS: a lista sai de `src/data/demo/clientes.ts` e vive no
  * estado desta tela — recarregar a página desfaz tudo. Troque `CLIENTES` por
  * uma consulta a uma tabela `clientes` e mande `salvar` e `excluir` gravarem lá
  * em vez de só chamar `setClientes`.
  */
 import { useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
-  Pencil,
   Plus,
   Search,
   SearchX,
-  Trash2,
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { PageHeader } from "../../components/layout/PageHeader.tsx";
-import { Badge, type BadgeProps } from "../../components/ui/badge.tsx";
 import { Button } from "../../components/ui/button.tsx";
 import { Card } from "../../components/ui/card.tsx";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../components/ui/dialog.tsx";
 import { EmptyState } from "../../components/ui/empty-state.tsx";
 import { Input } from "../../components/ui/input.tsx";
 import { Label } from "../../components/ui/label.tsx";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select.tsx";
-import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "../../components/ui/table.tsx";
-import { cn, emReais } from "../../lib/utils.ts";
+import { cn, novoId } from "../../lib/utils.ts";
+import { CLIENTES, STATUS, type Cliente } from "../../data/demo/clientes.ts";
+import { ConfirmacaoDeExclusao } from "./ConfirmacaoDeExclusao.tsx";
 import {
-  CLIENTES,
-  STATUS,
-  type Cliente,
-  type StatusDoCliente,
-} from "../../data/demo/clientes.ts";
-
-/* -------------------------------------------------------------------------
-   Como cada status aparece. A cor nunca é a única pista: o texto da etiqueta
-   já diz o estado.
-------------------------------------------------------------------------- */
-
-const APARENCIA_DO_STATUS: Record<
-  StatusDoCliente,
-  { rotulo: string; variante: BadgeProps["variant"] }
-> = {
-  ativo: { rotulo: "Ativo", variante: "success" },
-  pendente: { rotulo: "Pendente", variante: "warning" },
-  inativo: { rotulo: "Inativo", variante: "outline" },
-};
+  CLIENTE_EM_BRANCO,
+  DialogDeCliente,
+  esquemaDoCliente,
+  type CamposDoCliente,
+} from "./DialogDeCliente.tsx";
+import { LinhaDeCliente } from "./LinhaDeCliente.tsx";
 
 /* -------------------------------------------------------------------------
    Busca e ordenação.
@@ -157,56 +127,6 @@ function CabecalhoOrdenavel({
       </button>
     </TableHead>
   );
-}
-
-/* -------------------------------------------------------------------------
-   Formulário do cliente. As mensagens são o que a pessoa lê, então elas
-   nascem em português aqui.
-------------------------------------------------------------------------- */
-
-const esquemaDoCliente = z.object({
-  nome: z.string().trim().min(2, "Informe o nome do cliente."),
-  email: z.email("Informe um e-mail válido."),
-  whatsapp: z
-    .string()
-    .trim()
-    .min(1, "Informe o WhatsApp.")
-    // Contamos os dígitos, não os caracteres: assim "(11) 98812-4477" e
-    // "11988124477" valem a mesma coisa.
-    .refine(
-      (texto) => texto.replace(/\D/g, "").length >= 10,
-      "Informe o WhatsApp com DDD, como (11) 98888-7777.",
-    ),
-  cidade: z.string().trim().min(2, "Informe a cidade."),
-  status: z.enum(STATUS),
-  // O campo é `type="number"`: o navegador já devolve "1890.5" mesmo quando a
-  // pessoa digita "1890,5".
-  valor: z
-    .string()
-    .trim()
-    .min(1, "Informe o total comprado (use 0 se ainda não comprou).")
-    .refine((texto) => Number(texto) >= 0, "O total não pode ser negativo."),
-});
-
-type CamposDoCliente = z.infer<typeof esquemaDoCliente>;
-
-const CLIENTE_EM_BRANCO: CamposDoCliente = {
-  nome: "",
-  email: "",
-  whatsapp: "",
-  cidade: "",
-  status: "ativo",
-  valor: "0",
-};
-
-/**
- * Id do cliente criado na tela. Existe só enquanto a demo é em memória: com
- * banco de verdade, quem gera o id é o banco.
- */
-let sequencia = 0;
-function novoId(): string {
-  sequencia += 1;
-  return `novo-${sequencia}`;
 }
 
 /* -------------------------------------------------------------------------
@@ -435,254 +355,32 @@ export default function Tabela() {
             </TableHeader>
 
             <TableBody>
-              {lista.map((cliente) => {
-                const status = APARENCIA_DO_STATUS[cliente.status];
-                return (
-                  <TableRow key={cliente.id}>
-                    <TableCell>
-                      <p className="font-medium text-tinta">{cliente.nome}</p>
-                      <p className="text-xs text-suave">{cliente.email}</p>
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-suave tabular-nums">
-                      {cliente.whatsapp}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-suave">
-                      {cliente.cidade}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={status.variante}>{status.rotulo}</Badge>
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-suave">
-                      <time dateTime={cliente.ultimaCompra.toISOString()}>
-                        {format(cliente.ultimaCompra, "d 'de' MMM", {
-                          locale: ptBR,
-                        })}
-                      </time>
-                    </TableCell>
-                    <TableCell className="text-right font-medium whitespace-nowrap tabular-nums">
-                      {emReais(cliente.valor)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Editar ${cliente.nome}`}
-                          onClick={() => abrirEdicao(cliente)}
-                        >
-                          <Pencil />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Excluir ${cliente.nome}`}
-                          onClick={() => setParaExcluir(cliente)}
-                        >
-                          <Trash2 />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {lista.map((cliente) => (
+                <LinhaDeCliente
+                  key={cliente.id}
+                  cliente={cliente}
+                  aoEditar={abrirEdicao}
+                  aoExcluir={setParaExcluir}
+                />
+              ))}
             </TableBody>
           </Table>
         </Card>
       )}
 
-      {/* --- Diálogo de criar/editar ------------------------------------- */}
-      <Dialog open={dialogoAberto} onOpenChange={setDialogoAberto}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {emEdicao ? "Editar cliente" : "Novo cliente"}
-            </DialogTitle>
-            <DialogDescription>
-              {emEdicao
-                ? `Mudanças em ${emEdicao.nome}.`
-                : "Preencha os dados para começar a acompanhar este cliente."}
-            </DialogDescription>
-          </DialogHeader>
+      <DialogDeCliente
+        aberto={dialogoAberto}
+        aoMudarAbertura={setDialogoAberto}
+        emEdicao={emEdicao}
+        form={form}
+        aoSalvar={salvar}
+      />
 
-          {/* `noValidate`: quem valida é o zod, em português. */}
-          <form
-            noValidate
-            onSubmit={form.handleSubmit(salvar)}
-            className="grid gap-4 sm:grid-cols-2"
-          >
-            <div className="grid gap-2 sm:col-span-2">
-              <Label htmlFor="cliente-nome">Nome</Label>
-              <Input
-                {...form.register("nome")}
-                id="cliente-nome"
-                autoComplete="name"
-                placeholder="Ana Beatriz Souza"
-                aria-invalid={!!form.formState.errors.nome}
-                aria-describedby={
-                  form.formState.errors.nome ? "cliente-nome-erro" : undefined
-                }
-              />
-              {form.formState.errors.nome ? (
-                <p id="cliente-nome-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.nome.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="cliente-email">E-mail</Label>
-              <Input
-                {...form.register("email")}
-                id="cliente-email"
-                type="email"
-                autoComplete="email"
-                placeholder="voce@email.com"
-                aria-invalid={!!form.formState.errors.email}
-                aria-describedby={
-                  form.formState.errors.email ? "cliente-email-erro" : undefined
-                }
-              />
-              {form.formState.errors.email ? (
-                <p id="cliente-email-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.email.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="cliente-whatsapp">WhatsApp</Label>
-              <Input
-                {...form.register("whatsapp")}
-                id="cliente-whatsapp"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="(11) 98888-7777"
-                aria-invalid={!!form.formState.errors.whatsapp}
-                aria-describedby={
-                  form.formState.errors.whatsapp
-                    ? "cliente-whatsapp-erro"
-                    : undefined
-                }
-              />
-              {form.formState.errors.whatsapp ? (
-                <p
-                  id="cliente-whatsapp-erro"
-                  className="text-sm text-destrutivo"
-                >
-                  {form.formState.errors.whatsapp.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="cliente-cidade">Cidade</Label>
-              <Input
-                {...form.register("cidade")}
-                id="cliente-cidade"
-                autoComplete="address-level2"
-                placeholder="São Paulo"
-                aria-invalid={!!form.formState.errors.cidade}
-                aria-describedby={
-                  form.formState.errors.cidade ? "cliente-cidade-erro" : undefined
-                }
-              />
-              {form.formState.errors.cidade ? (
-                <p id="cliente-cidade-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.cidade.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="cliente-status">Status</Label>
-              {/* O Select do Radix não é um `<input>`, então quem o liga ao
-                  react-hook-form é o Controller. */}
-              <Controller
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="cliente-status" onBlur={field.onBlur}>
-                      <SelectValue placeholder="Escolha o status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATUS.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {APARENCIA_DO_STATUS[status].rotulo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className="grid gap-2 sm:col-span-2">
-              <Label htmlFor="cliente-valor">Total comprado (R$)</Label>
-              <Input
-                {...form.register("valor")}
-                id="cliente-valor"
-                type="number"
-                min="0"
-                step="0.01"
-                inputMode="decimal"
-                placeholder="0"
-                aria-invalid={!!form.formState.errors.valor}
-                aria-describedby={
-                  form.formState.errors.valor ? "cliente-valor-erro" : undefined
-                }
-              />
-              {form.formState.errors.valor ? (
-                <p id="cliente-valor-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.valor.message}
-                </p>
-              ) : null}
-            </div>
-
-            <DialogFooter className="sm:col-span-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
-              </DialogClose>
-              <Button type="submit">
-                {emEdicao ? "Salvar mudanças" : "Cadastrar"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* --- Confirmação de exclusão ------------------------------------- */}
-      <Dialog
-        open={paraExcluir !== null}
-        onOpenChange={(aberto) => {
-          if (!aberto) setParaExcluir(null);
-        }}
-      >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Excluir cliente</DialogTitle>
-            <DialogDescription>
-              {paraExcluir
-                ? `${paraExcluir.nome} sai da lista e não dá para desfazer.`
-                : ""}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
-            <Button variant="destructive" onClick={excluir}>
-              <Trash2 />
-              Excluir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmacaoDeExclusao
+        cliente={paraExcluir}
+        aoFechar={() => setParaExcluir(null)}
+        aoConfirmar={excluir}
+      />
     </>
   );
 }

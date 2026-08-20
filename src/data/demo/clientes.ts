@@ -4,7 +4,8 @@
  * PARA PLUGAR DADOS REAIS: troque `CLIENTES` por uma consulta a uma tabela
  * `clientes` (nome, email, whatsapp, cidade, status, valor, ultima_compra) e
  * mande criar/editar/excluir da tela para o banco em vez do estado da página.
- * Os e-mails abaixo são fictícios de propósito: nenhum endereço real aqui.
+ * Os e-mails abaixo terminam em `@example.com` de propósito: é o domínio que a
+ * RFC 2606 reserva para exemplo, e nada enviado para lá chega em alguém.
  */
 import { subDays } from "date-fns";
 
@@ -40,7 +41,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-01",
     nome: "Ana Beatriz Souza",
-    email: "ana.souza@email.com",
+    email: "ana.souza@example.com",
     whatsapp: "(11) 98812-4477",
     cidade: "São Paulo",
     status: "ativo",
@@ -50,7 +51,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-02",
     nome: "Bruno Carvalho",
-    email: "bruno.carvalho@email.com",
+    email: "bruno.carvalho@example.com",
     whatsapp: "(21) 99145-2093",
     cidade: "Rio de Janeiro",
     status: "ativo",
@@ -60,7 +61,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-03",
     nome: "Carla Menezes",
-    email: "carla.menezes@email.com",
+    email: "carla.menezes@example.com",
     whatsapp: "(31) 98877-1230",
     cidade: "Belo Horizonte",
     status: "pendente",
@@ -70,7 +71,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-04",
     nome: "Diego Nakamura",
-    email: "diego.nakamura@email.com",
+    email: "diego.nakamura@example.com",
     whatsapp: "(41) 99612-8845",
     cidade: "Curitiba",
     status: "ativo",
@@ -80,7 +81,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-05",
     nome: "Eduarda Lima",
-    email: "eduarda.lima@email.com",
+    email: "eduarda.lima@example.com",
     whatsapp: "(85) 98104-6672",
     cidade: "Fortaleza",
     status: "inativo",
@@ -90,7 +91,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-06",
     nome: "Felipe Andrade",
-    email: "felipe.andrade@email.com",
+    email: "felipe.andrade@example.com",
     whatsapp: "(51) 99283-4410",
     cidade: "Porto Alegre",
     status: "ativo",
@@ -100,7 +101,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-07",
     nome: "Gabriela Rocha",
-    email: "gabriela.rocha@email.com",
+    email: "gabriela.rocha@example.com",
     whatsapp: "(71) 98330-5521",
     cidade: "Salvador",
     status: "pendente",
@@ -110,7 +111,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-08",
     nome: "Henrique Barros",
-    email: "henrique.barros@email.com",
+    email: "henrique.barros@example.com",
     whatsapp: "(62) 99417-0088",
     cidade: "Goiânia",
     status: "ativo",
@@ -120,7 +121,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-09",
     nome: "Isabela Tavares",
-    email: "isabela.tavares@email.com",
+    email: "isabela.tavares@example.com",
     whatsapp: "(81) 98625-7734",
     cidade: "Recife",
     status: "inativo",
@@ -130,7 +131,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-10",
     nome: "João Pedro Martins",
-    email: "joao.martins@email.com",
+    email: "joao.martins@example.com",
     whatsapp: "(48) 99871-2205",
     cidade: "Florianópolis",
     status: "ativo",
@@ -140,7 +141,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-11",
     nome: "Larissa Fontes",
-    email: "larissa.fontes@email.com",
+    email: "larissa.fontes@example.com",
     whatsapp: "(27) 99610-3348",
     cidade: "Vitória",
     status: "ativo",
@@ -150,7 +151,7 @@ export const CLIENTES: Cliente[] = [
   {
     id: "cli-12",
     nome: "Marcos Vinícius Prado",
-    email: "marcos.prado@email.com",
+    email: "marcos.prado@example.com",
     whatsapp: "(61) 98254-9917",
     cidade: "Brasília",
     status: "pendente",

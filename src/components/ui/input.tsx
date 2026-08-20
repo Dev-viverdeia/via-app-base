@@ -12,6 +12,9 @@ import { cn } from "../../lib/utils.ts";
  *
  *   <Input id="email" aria-invalid={!!erro} aria-describedby="email-erro" />
  *   {erro ? <p id="email-erro" className="text-sm text-destrutivo">{erro}</p> : null}
+ *
+ * Em formulário, prefira o `<CampoDeTexto>` (`campo-de-texto.tsx`): ele já é
+ * este bloco inteiro — rótulo, campo, erro e os ids ligados — em uma linha.
  */
 export function Input({ className, type, ...props }: ComponentProps<"input">) {
   return (

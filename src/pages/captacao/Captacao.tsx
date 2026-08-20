@@ -21,8 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card.tsx";
-import { Input } from "../../components/ui/input.tsx";
-import { Label } from "../../components/ui/label.tsx";
+import { CampoDeTexto } from "../../components/ui/campo-de-texto.tsx";
 
 /* -------------------------------------------------------------------------
    Regras do formulário. As mensagens são o que o visitante lê, então elas
@@ -124,72 +123,32 @@ export default function Captacao() {
               onSubmit={form.handleSubmit(enviar)}
               className="grid gap-4"
             >
-              <div className="grid gap-2">
-                <Label htmlFor="captacao-nome">Nome</Label>
-                <Input
-                  {...form.register("nome")}
-                  id="captacao-nome"
-                  autoComplete="name"
-                  placeholder="Ana Beatriz Souza"
-                  aria-invalid={!!form.formState.errors.nome}
-                  aria-describedby={
-                    form.formState.errors.nome ? "captacao-nome-erro" : undefined
-                  }
-                />
-                {form.formState.errors.nome ? (
-                  <p id="captacao-nome-erro" className="text-sm text-destrutivo">
-                    {form.formState.errors.nome.message}
-                  </p>
-                ) : null}
-              </div>
+              <CampoDeTexto
+                rotulo="Nome"
+                {...form.register("nome")}
+                autoComplete="name"
+                placeholder="Ana Beatriz Souza"
+                erro={form.formState.errors.nome?.message}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="captacao-email">E-mail</Label>
-                <Input
-                  {...form.register("email")}
-                  id="captacao-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="voce@email.com"
-                  aria-invalid={!!form.formState.errors.email}
-                  aria-describedby={
-                    form.formState.errors.email
-                      ? "captacao-email-erro"
-                      : undefined
-                  }
-                />
-                {form.formState.errors.email ? (
-                  <p id="captacao-email-erro" className="text-sm text-destrutivo">
-                    {form.formState.errors.email.message}
-                  </p>
-                ) : null}
-              </div>
+              <CampoDeTexto
+                rotulo="E-mail"
+                {...form.register("email")}
+                type="email"
+                autoComplete="email"
+                placeholder="voce@email.com"
+                erro={form.formState.errors.email?.message}
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="captacao-whatsapp">WhatsApp</Label>
-                <Input
-                  {...form.register("whatsapp")}
-                  id="captacao-whatsapp"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="(11) 98888-7777"
-                  aria-invalid={!!form.formState.errors.whatsapp}
-                  aria-describedby={
-                    form.formState.errors.whatsapp
-                      ? "captacao-whatsapp-erro"
-                      : undefined
-                  }
-                />
-                {form.formState.errors.whatsapp ? (
-                  <p
-                    id="captacao-whatsapp-erro"
-                    className="text-sm text-destrutivo"
-                  >
-                    {form.formState.errors.whatsapp.message}
-                  </p>
-                ) : null}
-              </div>
+              <CampoDeTexto
+                rotulo="WhatsApp"
+                {...form.register("whatsapp")}
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="(11) 98888-7777"
+                erro={form.formState.errors.whatsapp?.message}
+              />
 
               <Button
                 type="submit"

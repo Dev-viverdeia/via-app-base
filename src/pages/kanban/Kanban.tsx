@@ -10,9 +10,14 @@ import { useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
+  KeyboardCode,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCorners,
+  getFirstCollision,
+  pointerWithin,
+  rectIntersection,
   useDraggable,
   useDroppable,
   useSensor,
@@ -21,8 +26,10 @@ import {
 import type {
   Active,
   Announcements,
+  CollisionDetection,
   DragEndEvent,
   DragStartEvent,
+  KeyboardCoordinateGetter,
   ScreenReaderInstructions,
   UniqueIdentifier,
 } from "@dnd-kit/core";
@@ -45,8 +52,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog.tsx";
+import { CampoDeTexto } from "../../components/ui/campo-de-texto.tsx";
 import { EmptyState } from "../../components/ui/empty-state.tsx";
-import { Input } from "../../components/ui/input.tsx";
 import { Label } from "../../components/ui/label.tsx";
 import {
   Select,
@@ -55,7 +62,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select.tsx";
-import { cn, emReais } from "../../lib/utils.ts";
+import { cn, emReais, novoId } from "../../lib/utils.ts";
 import {
   CARTOES,
   COLUNAS,
@@ -89,16 +96,6 @@ const CARTAO_EM_BRANCO: CamposDoCartao = {
   origem: "Indicação",
 };
 
-/**
- * Id do cartão criado na tela. Existe só enquanto a demo é em memória: com
- * banco de verdade, quem gera o id é o banco.
- */
-let sequencia = 0;
-function novoId(): string {
-  sequencia += 1;
-  return `novo-${sequencia}`;
-}
-
 /* -------------------------------------------------------------------------
    Acessibilidade do arrastar: sem isto o dnd-kit narra em inglês.
 ------------------------------------------------------------------------- */
@@ -117,7 +114,9 @@ const ANUNCIOS: Announcements = {
   onDragOver: ({ active, over }) =>
     over
       ? `Cartão ${clienteDoCartao(active)} está sobre a coluna ${tituloDaColuna(over.id)}.`
-      : undefined,
+      : // Fora de qualquer coluna. Ficar calado aqui deixaria no ar o último
+        // "está sobre a coluna X", que a essa altura já é mentira.
+        `Cartão ${clienteDoCartao(active)} está fora do quadro. Soltar aqui devolve ele para a coluna de onde saiu.`,
   onDragEnd: ({ active, over }) =>
     over
       ? `Cartão ${clienteDoCartao(active)} foi para a coluna ${tituloDaColuna(over.id)}.`
@@ -130,6 +129,76 @@ const INSTRUCOES: ScreenReaderInstructions = {
   draggable:
     "Para mover um cartão pelo teclado, aperte a barra de espaço para levantá-lo, use as setas para levá-lo até outra coluna e a barra de espaço de novo para soltar. Esc cancela.",
 };
+
+const SETAS: string[] = [
+  KeyboardCode.Left,
+  KeyboardCode.Right,
+  KeyboardCode.Up,
+  KeyboardCode.Down,
+];
+
+/**
+ * Para onde o cartão vai a cada seta. O padrão do dnd-kit anda 25 pixels por
+ * tecla — com colunas desta largura seriam umas quinze setas para chegar na
+ * vizinha, e a instrução na tela promete "use as setas". Aqui UMA seta pula
+ * para o centro da próxima coluna naquele lado (é o padrão "multiple
+ * containers" da documentação do dnd-kit).
+ */
+const irParaAColunaVizinha: KeyboardCoordinateGetter = (
+  evento,
+  { context: { active, collisionRect, droppableRects, droppableContainers } },
+) => {
+  if (!SETAS.includes(evento.code)) return;
+  evento.preventDefault();
+  if (!active || !collisionRect) return;
+
+  // Só as colunas que estão do lado para onde a seta aponta. `collisionRect` é
+  // o cartão onde ele está AGORA, então "à direita" é o que começa depois dele.
+  const candidatas = droppableContainers.getEnabled().filter((coluna) => {
+    const area = droppableRects.get(coluna.id);
+    if (!area) return false;
+    switch (evento.code) {
+      case KeyboardCode.Right:
+        return collisionRect.left + collisionRect.width <= area.left;
+      case KeyboardCode.Left:
+        return collisionRect.left >= area.left + area.width;
+      case KeyboardCode.Down:
+        return collisionRect.top < area.top;
+      default:
+        return collisionRect.top > area.top;
+    }
+  });
+
+  // Entre as candidatas, a mais perto. Nenhuma = já está na ponta do quadro:
+  // devolver nada deixa o cartão exatamente onde estava.
+  const vizinha = getFirstCollision(
+    closestCorners({
+      active,
+      collisionRect,
+      droppableRects,
+      droppableContainers: candidatas,
+      pointerCoordinates: null,
+    }),
+    "id",
+  );
+  const destino = vizinha == null ? undefined : droppableRects.get(vizinha);
+  if (!destino) return;
+
+  // O centro da coluna: é onde o cartão aparece e é onde a colisão cai.
+  return {
+    x: destino.left + (destino.width - collisionRect.width) / 2,
+    y: destino.top + (destino.height - collisionRect.height) / 2,
+  };
+};
+
+/**
+ * Qual coluna está recebendo o cartão. `pointerWithin` só acusa a coluna que
+ * está EMBAIXO do ponteiro: soltar fora do quadro devolve `over: null` e o
+ * cartão volta para o lugar. Ele depende do ponteiro, e o teclado não tem um —
+ * então nesse caso vale a área que o cartão cobre (`rectIntersection`).
+ */
+const ondeOCartaoCai: CollisionDetection = (args) =>
+  args.pointerCoordinates ? pointerWithin(args) : rectIntersection(args);
 
 /* -------------------------------------------------------------------------
    Peças do quadro.
@@ -169,8 +238,11 @@ function ConteudoDoCartao({ cartao }: { cartao: Cartao }) {
 
 /**
  * Um cartão que se deixa arrastar. O `attributes` do dnd-kit já traz
- * `role="button"`, `tabIndex` e as descrições que o leitor de tela anuncia;
- * `touch-none` é o que impede a página de rolar quando o dedo arrasta o cartão.
+ * `role="button"`, `tabIndex` e as descrições que o leitor de tela anuncia.
+ *
+ * Sem `touch-none` de propósito: no celular quem decide se o dedo arrasta ou
+ * rola é o TouchSensor lá embaixo (250 ms parado = arrasto). Com `touch-none`
+ * aqui, um deslize que começasse em cima do cartão nunca rolaria a página.
  */
 function CartaoArrastavel({ cartao }: { cartao: Cartao }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -188,7 +260,7 @@ function CartaoArrastavel({ cartao }: { cartao: Cartao }) {
         {...listeners}
         className={cn(
           CLASSE_DO_CARTAO,
-          "w-full cursor-grab touch-none transition-colors hover:border-marca/40",
+          "w-full cursor-grab transition-colors hover:border-marca/40",
           // Enquanto arrasta, o original desbota: quem se move é a cópia.
           isDragging && "opacity-40",
         )}
@@ -269,11 +341,21 @@ export default function Kanban() {
     defaultValues: CARTAO_EM_BRANCO,
   });
 
-  // `distance: 6` deixa o clique comum passar: só vira arrasto depois de andar
-  // 6 pixels com o botão apertado.
+  // Um sensor por jeito de arrastar, cada um com a sua regra:
+  // • mouse — `distance: 6` deixa o clique comum passar: só vira arrasto
+  //   depois de andar 6 pixels com o botão apertado;
+  // • toque — 250 ms com o dedo parado em cima (mexeu mais de 5 px antes
+  //   disso, desiste), e é isso que deixa o deslize rolar a página;
+  // • teclado — as setas pulam de coluna em coluna.
+  // Mouse e toque separados, e não um PointerSensor só: o PointerSensor pega
+  // o `pointerdown` do dedo antes do TouchSensor e a regra do toque nunca
+  // valeria.
   const sensores = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, { coordinateGetter: irParaAColunaVizinha }),
   );
 
   /** Os cartões separados por etapa, na ordem das colunas. */
@@ -342,7 +424,7 @@ export default function Kanban() {
 
       <DndContext
         sensors={sensores}
-        collisionDetection={closestCorners}
+        collisionDetection={ondeOCartaoCai}
         accessibility={{
           announcements: ANUNCIOS,
           screenReaderInstructions: INSTRUCOES,
@@ -397,45 +479,23 @@ export default function Kanban() {
             onSubmit={form.handleSubmit(criarCartao)}
             className="grid gap-4"
           >
-            <div className="grid gap-2">
-              <Label htmlFor="cartao-cliente">Cliente</Label>
-              <Input
-                {...form.register("cliente")}
-                id="cartao-cliente"
-                placeholder="Padaria Pão Nosso"
-                aria-invalid={!!form.formState.errors.cliente}
-                aria-describedby={
-                  form.formState.errors.cliente ? "cartao-cliente-erro" : undefined
-                }
-              />
-              {form.formState.errors.cliente ? (
-                <p id="cartao-cliente-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.cliente.message}
-                </p>
-              ) : null}
-            </div>
+            <CampoDeTexto
+              rotulo="Cliente"
+              {...form.register("cliente")}
+              placeholder="Padaria Pão Nosso"
+              erro={form.formState.errors.cliente?.message}
+            />
 
-            <div className="grid gap-2">
-              <Label htmlFor="cartao-valor">Valor estimado (R$)</Label>
-              <Input
-                {...form.register("valor")}
-                id="cartao-valor"
-                type="number"
-                min="0"
-                step="0.01"
-                inputMode="decimal"
-                placeholder="2400"
-                aria-invalid={!!form.formState.errors.valor}
-                aria-describedby={
-                  form.formState.errors.valor ? "cartao-valor-erro" : undefined
-                }
-              />
-              {form.formState.errors.valor ? (
-                <p id="cartao-valor-erro" className="text-sm text-destrutivo">
-                  {form.formState.errors.valor.message}
-                </p>
-              ) : null}
-            </div>
+            <CampoDeTexto
+              rotulo="Valor estimado (R$)"
+              {...form.register("valor")}
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="2400"
+              erro={form.formState.errors.valor?.message}
+            />
 
             <div className="grid gap-2">
               <Label htmlFor="cartao-origem">Origem</Label>
