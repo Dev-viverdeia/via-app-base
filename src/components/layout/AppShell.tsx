@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { PAGINAS } from "../../pages.config.ts";
+import { supabase } from "../../lib/supabase.ts";
 import { cn } from "../../lib/utils.ts";
 
 /**
@@ -11,6 +14,27 @@ export const NOME_DO_APP = "Meu app";
 
 /** A navegação é o registro de páginas: nada de menu escrito na mão. */
 const ITENS_DA_NAVEGACAO = PAGINAS.filter((pagina) => pagina.naNavbar);
+
+/**
+ * Encerra a sessão. Não navegamos daqui: quem observa a sessão é o
+ * `RequerSessao`, e ele já leva a pessoa para `/login` no instante em que ela
+ * morre — navegar aqui também seria mandar duas vezes.
+ *
+ * O supabase-js apaga a sessão local mesmo quando a revogação no servidor
+ * falha, então o aviso é o mesmo nos dois casos; o erro do servidor vai só
+ * para o console. O `catch` existe porque essa chamada também RELANÇA (trava
+ * de sessão, storage bloqueado) — sem ele, o clique não faria nada visível.
+ */
+async function sair() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error(error);
+    toast.success("Você saiu.");
+  } catch (erro) {
+    console.error(erro);
+    toast.error("Não foi possível sair agora. Tente de novo.");
+  }
+}
 
 /**
  * Moldura do app: barra lateral fixa no desktop, barra inferior no celular,
@@ -48,6 +72,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
+
+        {/* Rodapé da barra lateral: a saída fica longe da navegação, no canto
+            de baixo, onde ninguém clica sem querer. */}
+        <div className="shrink-0 border-t border-borda p-3">
+          <button
+            type="button"
+            onClick={sair}
+            className="flex w-full items-center gap-3 rounded-m px-3 py-2 text-sm font-medium text-suave transition-colors hover:bg-fundo hover:text-tinta"
+          >
+            <LogOut className="size-5 shrink-0" aria-hidden="true" />
+            Sair
+          </button>
+        </div>
       </aside>
 
       {/* --- Conteúdo da página ------------------------------------------ */}
@@ -78,6 +115,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             {pagina.titulo}
           </NavLink>
         ))}
+
+        {/* No celular a saída é o último item da barra, com a mesma linguagem
+            visual dos outros — só que ela não leva a lugar nenhum. */}
+        <button
+          type="button"
+          onClick={sair}
+          className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium text-suave transition-colors"
+        >
+          <LogOut className="size-5 shrink-0" aria-hidden="true" />
+          Sair
+        </button>
       </nav>
     </div>
   );

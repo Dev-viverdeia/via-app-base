@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   isAuthRetryableFetchError,
   type AuthError,
+  type Session,
 } from "@supabase/supabase-js";
 import { NOME_DO_APP } from "../../components/layout/AppShell.tsx";
 import { Button } from "../../components/ui/button.tsx";
@@ -47,6 +48,14 @@ type CamposEntrar = z.infer<typeof esquemaEntrar>;
 type CamposCriarConta = z.infer<typeof esquemaCriarConta>;
 
 /**
+ * A frase para quando não sabemos dizer nada melhor. Ela aparece em dois
+ * lugares (erro sem tradução e falha relançada), e nos dois o objeto real vai
+ * para o console — a tela fica em português, o diagnóstico não se perde.
+ */
+const MENSAGEM_GENERICA =
+  "Não foi possível concluir agora. Tente de novo em instantes.";
+
+/**
  * Traduz o erro que o Supabase devolve para uma frase que o usuário entende.
  * O texto técnico (em inglês) nunca vai para a tela.
  */
@@ -76,7 +85,12 @@ function mensagemDoErro(erro: AuthError): string {
     case "over_email_send_rate_limit":
       return "Muitas tentativas seguidas. Espere um minuto e tente de novo.";
     default:
-      return "Não foi possível concluir agora. Tente de novo em instantes.";
+      // Código que ainda não traduzimos — inclusive os que denunciam o
+      // ambiente errado (chave publicável trocada, projeto pausado). A tela
+      // segue em português; o objeto de verdade vai para o console, senão
+      // esse erro fica impossível de diagnosticar.
+      console.error(erro);
+      return MENSAGEM_GENERICA;
   }
 }
 
@@ -87,10 +101,20 @@ function mensagemDoErro(erro: AuthError): string {
  */
 function rotaDeVolta(estado: unknown): string {
   const de = (estado as { de?: unknown } | null)?.de;
-  if (typeof de === "string" && de.startsWith("/") && !de.startsWith("//")) {
-    return de;
+  // Exigir "/" no começo já barra endereço absoluto ("https://…", "mailto:…").
+  if (typeof de !== "string" || !de.startsWith("/")) return "/";
+
+  // Quem decide se o destino continua dentro de casa é o próprio parser de
+  // URL do navegador, não um teste de texto: "/\evil.com" passaria por
+  // qualquer comparação de prefixo (o parser trata a barra invertida como
+  // barra) e levaria a pessoa para fora depois do login.
+  try {
+    return new URL(de, window.location.origin).origin === window.location.origin
+      ? de
+      : "/";
+  } catch {
+    return "/";
   }
-  return "/";
 }
 
 /**
@@ -122,13 +146,24 @@ export default function Login() {
 
   async function entrar(campos: CamposEntrar) {
     setErroEntrar(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: campos.email,
-      password: campos.senha,
-    });
 
-    if (error) {
-      setErroEntrar(mensagemDoErro(error));
+    // O `try` cobre só a chamada: nem toda falha volta em `error`. Algumas o
+    // supabase-js RELANÇA (a trava de sessão estourando o tempo, o storage do
+    // navegador bloqueado). Sem o catch, o react-hook-form relança de novo e a
+    // pessoa vê o botão parar de girar sem uma linha de explicação.
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: campos.email,
+        password: campos.senha,
+      });
+
+      if (error) {
+        setErroEntrar(mensagemDoErro(error));
+        return;
+      }
+    } catch (erro) {
+      console.error(erro);
+      setErroEntrar(MENSAGEM_GENERICA);
       return;
     }
 
@@ -138,19 +173,31 @@ export default function Login() {
 
   async function criarConta(campos: CamposCriarConta) {
     setErroCriarConta(null);
-    const { data, error } = await supabase.auth.signUp({
-      email: campos.email,
-      password: campos.senha,
-    });
 
-    if (error) {
-      setErroCriarConta(mensagemDoErro(error));
+    // Mesmo cuidado do `entrar`: o que o supabase-js relança precisa virar
+    // frase na tela, não um formulário que para de girar em silêncio.
+    let sessaoCriada: Session | null = null;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: campos.email,
+        password: campos.senha,
+      });
+
+      if (error) {
+        setErroCriarConta(mensagemDoErro(error));
+        return;
+      }
+
+      sessaoCriada = data.session;
+    } catch (erro) {
+      console.error(erro);
+      setErroCriarConta(MENSAGEM_GENERICA);
       return;
     }
 
     // Com confirmação de e-mail ligada no projeto, o cadastro não abre sessão:
     // a pessoa continua nesta tela até clicar no link que recebeu.
-    if (!data.session) {
+    if (!sessaoCriada) {
       toast.success("Conta criada. Confirme o e-mail que enviamos para entrar.");
       return;
     }
