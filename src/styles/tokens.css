@@ -1,37 +1,37 @@
 /* =============================================================================
-   Identidade visual do app — arquivo unico.
-   Trocar a marca inteira = editar SO este arquivo. Nenhum componente escreve
-   cor, raio ou sombra na mao: todos usam os utilitarios gerados aqui embaixo
+   Identidade visual do app — arquivo único.
+   Trocar a marca inteira = editar SÓ este arquivo. Nenhum componente escreve
+   cor, raio ou sombra na mão: todos usam os utilitários gerados aqui embaixo
    (bg-fundo, text-tinta, border-borda, rounded-m, shadow-g, font-sans...).
-   O tema escuro segue a preferencia do sistema (prefers-color-scheme).
+   O tema escuro segue a preferência do sistema (prefers-color-scheme).
 ============================================================================= */
 
 :root {
   color-scheme: light dark;
 
   /* --- Cores: tema claro ------------------------------------------------- */
-  /* Fundo da pagina e fundo dos cartoes/paineis que ficam por cima dela. */
+  /* Fundo da página e fundo dos cartões/painéis que ficam por cima dela. */
   --fundo: #f6f8fc;
   --superficie: #ffffff;
-  /* Linha que separa areas (bordas de cartao, divisorias, contorno de input). */
+  /* Linha que separa áreas (bordas de cartão, divisórias, contorno de input). */
   --borda: #e2e7f0;
-  /* Texto principal e texto secundario (legendas, descricoes, placeholders). */
+  /* Texto principal e texto secundário (legendas, descrições, placeholders). */
   --tinta: #0f1729;
   --suave: #5b6880;
-  /* Cor da marca: botao primario, link, foco, destaque. */
+  /* Cor da marca: botão primário, link, foco, destaque. */
   --marca: #2563eb;
-  /* Texto/icone que fica POR CIMA da cor da marca. */
+  /* Texto/ícone que fica POR CIMA da cor da marca. */
   --marca-tinta: #ffffff;
-  /* Estados: sucesso, aviso, erro/acao destrutiva. */
+  /* Estados: sucesso, aviso, erro/ação destrutiva. */
   --positivo: #15803d;
   --atencao: #b45309;
   --destrutivo: #dc2626;
 
   /* --- Raios (cantos arredondados) --------------------------------------- */
-  --raio-p: 0.5rem; /* input, badge, botao pequeno */
-  --raio-m: 0.875rem; /* botao, campo, item de lista */
-  --raio-g: 1.25rem; /* cartao, painel, modal */
-  --raio-total: 9999px; /* pilula, avatar */
+  --raio-p: 0.5rem; /* input, badge, botão pequeno */
+  --raio-m: 0.875rem; /* botão, campo, item de lista */
+  --raio-g: 1.25rem; /* cartão, painel, modal */
+  --raio-total: 9999px; /* pílula, avatar */
 
   /* --- Sombras ----------------------------------------------------------- */
   --sombra-p: 0 1px 2px rgb(15 23 42 / 0.06);
@@ -45,7 +45,7 @@
     "Liberation Mono", monospace;
 }
 
-/* --- Cores: tema escuro (preferencia do sistema) -------------------------- */
+/* --- Cores: tema escuro (preferência do sistema) -------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
     --fundo: #070d1a;
@@ -66,8 +66,8 @@
 }
 
 /* =============================================================================
-   Ponte para o Tailwind: cada variavel acima vira utilitario.
-   `inline` faz o Tailwind escrever var(--marca) direto na regra, entao o tema
+   Ponte para o Tailwind: cada variável acima vira utilitário.
+   `inline` faz o Tailwind escrever var(--marca) direto na regra, então o tema
    escuro troca sozinho sem precisar de nenhuma variante `dark:`.
 ============================================================================= */
 

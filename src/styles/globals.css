@@ -15,7 +15,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Anel de foco visivel e consistente em tudo que recebe teclado. */
+  /* Anel de foco visível e consistente em tudo que recebe teclado. */
   :focus-visible {
     outline: 2px solid var(--marca);
     outline-offset: 2px;
