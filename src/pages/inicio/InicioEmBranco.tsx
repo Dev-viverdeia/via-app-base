@@ -7,7 +7,7 @@
  * `min-h` nem `<h1>` próprios — a boas-vindas só faz sentido enquanto o app
  * é vazio.
  */
-import { Sparkles } from "lucide-react";
+import { Rocket } from "lucide-react";
 import { EmptyState } from "../../components/ui/empty-state.tsx";
 
 export default function InicioEmBranco() {
@@ -31,7 +31,7 @@ export default function InicioEmBranco() {
       {/* Sem `acoes`: o que tira o app do vazio é a conversa na plataforma, e
           ela acontece fora daqui — botão nenhum nesta tela resolveria. */}
       <EmptyState
-        icone={Sparkles}
+        icone={Rocket}
         titulo="Nada por aqui ainda"
         descricao="Conte no chat o que o seu app precisa fazer — a primeira tela aparece no lugar desta."
         className="w-full max-w-md"
