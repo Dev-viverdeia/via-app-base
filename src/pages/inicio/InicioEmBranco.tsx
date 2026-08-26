@@ -3,9 +3,11 @@
  * sem nenhuma tela pronta. Na criação do projeto, a plataforma copia este
  * conteúdo para dentro do `Inicio.tsx` (se você está lendo isto lá, foi isso
  * que aconteceu). Ao construir a primeira tela de verdade, SUBSTITUA este
- * conteúdo inteiro voltando ao padrão da casa: `PageHeader` no topo, sem
- * `min-h` nem `<h1>` próprios — a boas-vindas só faz sentido enquanto o app
- * é vazio.
+ * conteúdo inteiro — e escolha a forma pelo pedido do dono (ver "Site ou
+ * app?" no CLAUDE.md): num APP, `PageHeader` no topo dentro do shell; num
+ * SITE, página standalone (`protegida: false`) desenhando o próprio
+ * `<main>`, sem shell. A boas-vindas só faz sentido enquanto o projeto é
+ * vazio.
  */
 import { Rocket } from "lucide-react";
 import { EmptyState } from "../../components/ui/empty-state.tsx";
