@@ -71,6 +71,7 @@ Quando o dono libera um conector para o site, a página chama `POST /via/conecto
 ## O que não tocar
 
 - `scripts/verificar.mjs`, `public/_redirects`, `vercel.json` — infraestrutura do template.
+- `public/via-ponte.js` e a tag dele no `index.html` — é a ponte de inspeção da plataforma (o botão "Apontar" do editor depende dela; fora do editor ela é inerte).
 - Os marcadores `// <via:paginas>` / `// </via:paginas>` e o formato das entradas.
 - `package-lock.json` à mão (só muda via `package.json`).
 - `src/lib/supabase.ts` além do que ele já é.
