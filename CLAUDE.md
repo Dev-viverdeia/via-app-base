@@ -42,6 +42,8 @@ Depois de mexer no registro, no `package.json` ou em `CLAUDE.md`, o dono pode ro
 
 Convenção de nomes: os **primitivos têm API em inglês** (`variant`, `size` — padrão shadcn); os **compostos nossos têm props em pt-BR** (`EmptyState` com `icone/titulo/descricao/acoes`, `PageHeader` com `titulo/acoes`, `CampoDeTexto` com `rotulo/erro/dica`). Siga a convenção do arquivo em que estiver.
 
+**Ícones: NUNCA importe ícones de marca do `lucide-react`.** Ícones de redes sociais e marcas — `Instagram`, `Facebook`, `Twitter`, `Youtube`, `Linkedin`, `Github`, `Whatsapp` e afins — **não existem** neste pacote (foram removidos por marca registrada) e importar qualquer um deles **quebra o site inteiro numa tela em branco**, sem erro visível. Para contato e redes sociais use `AtSign`, `Mail`, `Phone`, `MessageCircle`, `Send`, `Link` ou `Share2`, ou um link de texto simples (`<a href="https://instagram.com/...">Instagram</a>`). Na dúvida sobre um ícone existir, use um genérico seguro (`Circle`, `Star`, `Heart`) em vez de arriscar um nome de marca.
+
 - Precisa de um visual novo? **Crie uma variante no componente existente** (cva) em vez de duplicar o arquivo ou estilizar por fora.
 - Campo de formulário = `CampoDeTexto` — ele já liga `label`, `id`, `aria-invalid` e `aria-describedby` entre si. Não escreva esse quarteto à mão.
 - Todo estado vazio usa `EmptyState` (com ação quando houver o que fazer). Toda ação que salva/exclui confirma com `toast` do sonner, em frase neutra de gênero ("X entrou na lista", não "X foi cadastrado").
