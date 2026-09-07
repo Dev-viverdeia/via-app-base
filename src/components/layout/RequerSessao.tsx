@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase.ts";
+import { MODO_DEMONSTRACAO } from "../../lib/demonstracao.ts";
 
 /**
  * Porteiro das telas protegidas.
@@ -22,6 +23,8 @@ export function RequerSessao({ children }: { children: ReactNode }) {
   const [sessao, setSessao] = useState<Session | null | undefined>(undefined);
 
   useEffect(() => {
+    // Em modo de demonstração não há sessão para ouvir.
+    if (MODO_DEMONSTRACAO) return;
     let vivo = true;
 
     // A sessão guardada no navegador. Sem nenhuma salva, isto responde na
@@ -42,6 +45,11 @@ export function RequerSessao({ children }: { children: ReactNode }) {
       assinatura.subscription.unsubscribe();
     };
   }, []);
+
+  // Modo de demonstração (só no preview, com o cookie da plataforma): a
+  // conferência automática entra sem conta e vê as telas com os dados de
+  // exemplo. Ver `src/lib/demonstracao.ts`.
+  if (MODO_DEMONSTRACAO) return <>{children}</>;
 
   if (sessao === undefined) {
     return (

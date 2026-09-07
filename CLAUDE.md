@@ -61,6 +61,7 @@ Convenção de nomes: os **primitivos têm API em inglês** (`variant`, `size` �
 - **Tabela, coluna, policy ou function novas: SÓ pelo fluxo de migração da plataforma** (você propõe a migração no chat; o dono aprova antes de aplicar). Nunca invente outra via.
 - **Toda tabela nasce com política RLS.** Sem RLS, o link público do preview dá acesso ao banco do dono — é o pior erro possível neste projeto. Se a tela é pública (ex.: captação gravando em `leads`), a política é de INSERT anônimo estrito; leitura fica para usuários autenticados.
 - Login, cadastro e a guarda de sessão (`RequerSessao`) já existem e funcionam com o Supabase do dono. Não reimplemente autenticação.
+- **Modo de demonstração** (`src/lib/demonstracao.ts`): no preview, quando a plataforma marca a visita com o cookie `via_demonstracao=1`, a guarda deixa entrar sem conta e as telas mostram os dados de exemplo de `src/data/demo` — é assim que a conferência automática vê as telas protegidas. Toda tela protegida nova precisa abrir nesse modo sem rede: quando `MODO_DEMONSTRACAO` for verdadeiro, mostre dados de exemplo em vez de consultar o Supabase. Nunca remova o modo nem o condicione a login; ele não existe no site publicado.
 
 ## Dependências
 
