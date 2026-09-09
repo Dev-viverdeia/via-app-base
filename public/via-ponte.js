@@ -1,9 +1,11 @@
-// Ponte de inspeção da plataforma Viver de IA Builder.
-// Permite ao editor da plataforma (parent) armar um modo "apontar": o aluno
-// clica num elemento do preview e o editor recebe um resumo estrutural para
-// anexar ao pedido. Fora do editor (site publicado, aba solta) este arquivo
-// é inerte: sai no primeiro guarda. Não remova nem edite — o botão "Apontar"
-// do editor depende dele.
+// Ponte da plataforma Viver de IA Builder (versão 2).
+// Dois serviços para o editor da plataforma (parent): o modo "apontar" (a
+// pessoa clica num elemento do preview e o editor recebe um resumo estrutural
+// para anexar ao pedido) e o aviso de erro na tela (código que quebrou, promessa
+// que falhou, arquivo que não compila) para o botão "Corrigir com o Agente".
+// Fora do editor (site publicado, aba solta) este arquivo é inerte: sai no
+// primeiro guarda. Não remova nem edite — o editor depende dele e o ambiente
+// o atualiza sozinho.
 (function () {
   "use strict";
   if (window.parent === window) return;
@@ -178,6 +180,134 @@
       document.removeEventListener(nome, engolir, true);
     });
   }
+
+  // ── Erros da tela → editor ─────────────────────────────────────────────
+  // Sem a origem do editor ainda (ela só chega com o primeiro "inspecionar"),
+  // o aviso vai para cada origem permitida; o postMessage descarta em
+  // silêncio as que não casam com o parent real. Nunca "*".
+  function difundir(mensagem) {
+    PARENT_PERMITIDOS.forEach(function (origem) {
+      try { window.parent.postMessage(mensagem, origem); } catch (e) { /* origem não casa */ }
+    });
+  }
+
+  function textoDeErro(valor, max) {
+    return String(valor == null ? "" : valor)
+      .replace(/[\u0000-\u0008\u000b-\u001f\u007f]+/g, " ")
+      .replace(/[ \t]+/g, " ")
+      .trim()
+      .slice(0, max);
+  }
+
+  // "https://porta-id.viverdeai.ai/src/pages/Inicio.tsx?t=123" → "src/pages/Inicio.tsx"
+  function arquivoRelativo(valor) {
+    var texto = textoDeErro(valor, 400);
+    if (!texto) return null;
+    var semQuery = texto.split("?")[0];
+    var idx = semQuery.indexOf(location.origin + "/");
+    if (idx === 0) semQuery = semQuery.slice(location.origin.length + 1);
+    return semQuery.slice(0, 200) || null;
+  }
+
+  function quadros(pilha) {
+    var linhas = String(pilha || "").split("\n");
+    var saida = [];
+    for (var i = 0; i < linhas.length && saida.length < 5; i += 1) {
+      var linha = textoDeErro(linhas[i], 300);
+      if (!linha || linha.indexOf("at ") !== 0 && linha.indexOf("@") === -1) continue;
+      saida.push(linha.replace(/\?t=\d+/g, "").split(location.origin + "/").join("").slice(0, 200));
+    }
+    return saida;
+  }
+
+  var ultimosDoConsole = [];
+  var vistos = {};
+  var enviados = 0;
+  var MAX_ERROS = 20;
+
+  function reportar(tipo, mensagem, pilha, arquivo, linha, coluna) {
+    try {
+      var texto = textoDeErro(mensagem, 500) || "Erro sem mensagem";
+      var assinatura = tipo + "|" + texto.slice(0, 160) + "|" + (arquivo || "") + ":" + (linha || "");
+      if (vistos[assinatura] || enviados >= MAX_ERROS) return;
+      vistos[assinatura] = true;
+      enviados += 1;
+      difundir({
+        source: "via-ponte",
+        v: V,
+        type: "erro",
+        payload: {
+          tipo: tipo,
+          mensagem: texto,
+          pilha: quadros(pilha),
+          arquivo: arquivo || null,
+          linha: typeof linha === "number" && linha > 0 ? linha : null,
+          coluna: typeof coluna === "number" && coluna > 0 ? coluna : null,
+          rota: location.pathname,
+          console: ultimosDoConsole.slice(0, 3),
+        },
+      });
+    } catch (e) { /* a ponte nunca pode derrubar a página */ }
+  }
+
+  // Código que quebrou em uso (inclui erro de renderização do React, que o
+  // React relança). Erro de carregar recurso (imagem, script) chega com
+  // target de elemento e não interessa aqui.
+  window.addEventListener("error", function (event) {
+    if (!event || (event.target && event.target !== window)) return;
+    var erro = event.error;
+    if (erro && typeof erro === "object") {
+      reportar("execucao", erro.message || String(erro), erro.stack, arquivoRelativo(event.filename), event.lineno, event.colno);
+    } else if (event.message) {
+      reportar("execucao", event.message, "", arquivoRelativo(event.filename), event.lineno, event.colno);
+    }
+  }, true);
+
+  window.addEventListener("unhandledrejection", function (event) {
+    var motivo = event && event.reason;
+    var mensagem = motivo && typeof motivo === "object" && motivo.message ? motivo.message : String(motivo);
+    reportar("promessa", mensagem, motivo && motivo.stack, null, null, null);
+  });
+
+  // Erro de compilação: o servidor de desenvolvimento desenha uma sobreposição
+  // própria; lê-se a mensagem e o arquivo de dentro dela.
+  function lerSobreposicao(no) {
+    try {
+      var raiz = no.shadowRoot || no;
+      var corpo = raiz.querySelector(".message-body") || raiz.querySelector(".message") || raiz;
+      var arquivo = raiz.querySelector(".file-link") || raiz.querySelector(".file");
+      reportar("compilacao", corpo.textContent, "", arquivo ? arquivoRelativo(arquivo.textContent) : null, null, null);
+    } catch (e) { /* sobreposição em outro formato */ }
+  }
+  try {
+    new MutationObserver(function (mutacoes) {
+      for (var i = 0; i < mutacoes.length; i += 1) {
+        var adicionados = mutacoes[i].addedNodes;
+        for (var j = 0; j < adicionados.length; j += 1) {
+          var no = adicionados[j];
+          if (no && no.tagName === "VITE-ERROR-OVERLAY") lerSobreposicao(no);
+        }
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) { /* sem observador: os outros avisos seguem valendo */ }
+
+  // O que o app mandou para o console de erros vai junto do próximo aviso,
+  // como contexto; sozinho não é aviso (bibliotecas reclamam de tudo).
+  try {
+    var consoleErro = console.error;
+    console.error = function () {
+      try {
+        var partes = [];
+        for (var i = 0; i < arguments.length && i < 3; i += 1) {
+          var a = arguments[i];
+          partes.push(textoDeErro(a && typeof a === "object" && a.message ? a.message : a, 160));
+        }
+        ultimosDoConsole.unshift(partes.join(" ").slice(0, 200));
+        ultimosDoConsole = ultimosDoConsole.slice(0, 3);
+      } catch (e) { /* segue */ }
+      return consoleErro.apply(console, arguments);
+    };
+  } catch (e) { /* console imutável: segue sem contexto */ }
 
   window.addEventListener("message", function (event) {
     if (event.source !== window.parent) return;
