@@ -3,6 +3,7 @@ import { cn } from "../../lib/utils.ts";
 
 /**
  * Cartão: a caixa padrão de conteúdo do app (indicador, formulário, lista).
+ * É de vidro: translúcido, com aro de luz e sombra suave — sem borda.
  *
  *   <Card>
  *     <CardHeader>
@@ -14,15 +15,13 @@ import { cn } from "../../lib/utils.ts";
  *   </Card>
  *
  * As partes são opcionais: um `<Card className="p-6">` com conteúdo direto
- * também vale para caixas simples.
+ * também vale para caixas simples. Nunca escreva `border` num cartão: o
+ * vidro já separa.
  */
 export function Card({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={cn(
-        "rounded-g border border-borda bg-superficie text-tinta shadow-p",
-        className,
-      )}
+      className={cn("rounded-g vidro text-tinta", className)}
       {...props}
     />
   );
@@ -53,7 +52,7 @@ export function CardTitle({ className, ...props }: ComponentProps<"h3">) {
 
 export function CardDescription({ className, ...props }: ComponentProps<"p">) {
   return (
-    <p className={cn("text-sm text-pretty text-suave", className)} {...props} />
+    <p className={cn("text-base text-pretty text-suave", className)} {...props} />
   );
 }
 

@@ -28,7 +28,7 @@ export function LinhaDeCliente({
     <TableRow>
       <TableCell>
         <p className="font-medium text-tinta">{cliente.nome}</p>
-        <p className="text-xs text-suave">{cliente.email}</p>
+        <p className="text-sm text-suave">{cliente.email}</p>
       </TableCell>
       <TableCell className="whitespace-nowrap text-suave tabular-nums">
         {cliente.whatsapp}

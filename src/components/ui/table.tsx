@@ -3,7 +3,9 @@ import { cn } from "../../lib/utils.ts";
 
 /**
  * Tabela. O `<Table>` já vem dentro de uma caixa que rola de lado no celular,
- * então a tabela nunca estoura a largura da tela.
+ * então a tabela nunca estoura a largura da tela. A caixa é `relative` de
+ * propósito: um texto só para leitor de tela (`sr-only`, posicionado) dentro
+ * de uma célula fora da vista escapava do recorte e esticava a página inteira.
  *
  *   <Table>
  *     <TableHeader>
@@ -25,13 +27,13 @@ import { cn } from "../../lib/utils.ts";
 export function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div
-      className="w-full overflow-x-auto"
+      className="relative w-full overflow-x-auto"
       role="region"
       tabIndex={0}
       aria-label="Tabela com rolagem horizontal"
     >
       <table
-        className={cn("w-full caption-bottom text-sm text-tinta", className)}
+        className={cn("w-full caption-bottom text-[15px] text-tinta", className)}
         {...props}
       />
     </div>
@@ -57,7 +59,7 @@ export function TableFooter({ className, ...props }: ComponentProps<"tfoot">) {
   return (
     <tfoot
       className={cn(
-        "border-t border-borda bg-marca/5 font-medium [&>tr]:last:border-b-0",
+        "border-t border-borda font-medium [&>tr]:last:border-b-0",
         className,
       )}
       {...props}
@@ -69,7 +71,7 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
   return (
     <tr
       className={cn(
-        "border-b border-borda transition-colors hover:bg-marca/5 data-[state=selected]:bg-marca/10",
+        "border-b border-borda transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-marca/5 data-[state=selected]:bg-marca/10",
         className,
       )}
       {...props}
@@ -82,7 +84,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
     <th
       className={cn(
-        "h-11 px-3 text-left align-middle text-xs font-semibold tracking-wide text-suave uppercase whitespace-nowrap",
+        "h-11 px-2.5 text-left align-middle text-[11px] font-semibold tracking-[0.08em] text-suave uppercase whitespace-nowrap",
         className,
       )}
       {...props}
@@ -92,7 +94,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
 
 export function TableCell({ className, ...props }: ComponentProps<"td">) {
   return (
-    <td className={cn("px-3 py-3 align-middle", className)} {...props} />
+    <td className={cn("px-2.5 py-3.5 align-middle", className)} {...props} />
   );
 }
 
@@ -102,6 +104,6 @@ export function TableCaption({
   ...props
 }: ComponentProps<"caption">) {
   return (
-    <caption className={cn("mt-4 text-sm text-suave", className)} {...props} />
+    <caption className={cn("mt-4 text-base text-suave", className)} {...props} />
   );
 }

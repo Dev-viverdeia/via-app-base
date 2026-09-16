@@ -4,6 +4,11 @@
    cor, raio ou sombra na mão: todos usam os utilitários gerados aqui embaixo
    (bg-fundo, text-tinta, border-borda, rounded-m, shadow-g, font-sans...).
    O tema escuro segue a preferência do sistema (prefers-color-scheme).
+
+   O app nasce de VIDRO: superfícies translúcidas com aro de luz e sombra
+   suave sobre uma atmosfera de luz (globals.css). A linha de borda existe
+   só como fio de separação, nunca para contornar uma caixa — quem separa é
+   o aro e a sombra.
 ============================================================================= */
 
 :root {
@@ -11,10 +16,11 @@
 
   /* --- Cores: tema claro ------------------------------------------------- */
   /* Fundo da página e fundo dos cartões/painéis que ficam por cima dela. */
-  --fundo: #f6f8fc;
+  --fundo: #f4f6fb;
   --superficie: #ffffff;
-  /* Linha que separa áreas (bordas de cartão, divisórias, contorno de input). */
-  --borda: #e2e7f0;
+  /* FIO de separação (divisória, linha de tabela). É quase invisível de
+     propósito: uma caixa nunca se desenha com ele — usa o vidro. */
+  --borda: rgb(15 23 42 / 0.08);
   /* Texto principal e texto secundário (legendas, descrições, placeholders). */
   --tinta: #0f1729;
   --suave: #5b6880;
@@ -27,18 +33,42 @@
   --atencao: #b45309;
   --destrutivo: #dc2626;
   /* Véu que escurece a página atrás do modal — precisa ser mais escuro que o fundo. */
-  --sobreposicao: rgb(11 18 32 / 0.45);
+  --sobreposicao: rgb(11 18 32 / 0.4);
+
+  /* --- Vidro ------------------------------------------------------------- */
+  /* A superfície translúcida (cartão, campo, barra) e a versão mais opaca
+     (barra lateral, diálogo, menu), sempre por cima da atmosfera. */
+  --vidro: rgb(255 255 255 / 0.62);
+  --vidro-alto: rgb(255 255 255 / 0.82);
+  /* O aro de luz que contorna o vidro (vira um degradê de 1px). */
+  --aro: rgb(255 255 255 / 0.95);
+  --aro-fim: rgb(255 255 255 / 0.35);
+  --desfoque: 20px;
+  --sombra-vidro: 0 12px 32px -14px rgb(15 23 42 / 0.22), 0 1px 0 rgb(255 255 255 / 0.55) inset;
+  /* As duas luzes da atmosfera atrás do app (globals.css). */
+  --luz-1: color-mix(in srgb, var(--marca) 13%, transparent);
+  --luz-2: rgb(255 255 255 / 0.9);
+  /* O brilho no topo do botão cheio e a sombra colorida embaixo dele. */
+  --brilho: rgb(255 255 255 / 0.22);
+  --sombra-marca: 0 8px 20px -10px var(--marca);
+  /* O halo do foco em campos e controles. */
+  --halo: color-mix(in srgb, var(--marca) 22%, transparent);
 
   /* --- Raios (cantos arredondados) --------------------------------------- */
-  --raio-p: 0.5rem; /* input, badge, botão pequeno */
-  --raio-m: 0.875rem; /* botão, campo, item de lista */
-  --raio-g: 1.25rem; /* cartão, painel, modal */
-  --raio-total: 9999px; /* pílula, avatar */
+  --raio-p: 0.625rem; /* input pequeno, item de menu */
+  --raio-m: 0.875rem; /* campo, item de lista */
+  --raio-g: 1.375rem; /* cartão, painel, modal */
+  --raio-total: 9999px; /* pílula, botão, avatar */
 
   /* --- Sombras ----------------------------------------------------------- */
   --sombra-p: 0 1px 2px rgb(15 23 42 / 0.06);
   --sombra-m: 0 8px 24px -8px rgb(15 23 42 / 0.14);
   --sombra-g: 0 24px 60px -20px rgb(15 23 42 / 0.24);
+
+  /* --- Movimento --------------------------------------------------------- */
+  --curva: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-rapido: 120ms;
+  --t-suave: 220ms;
 
   /* --- Tipografia -------------------------------------------------------- */
   --fonte: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
@@ -52,7 +82,7 @@
   :root {
     --fundo: #070d1a;
     --superficie: #0e1626;
-    --borda: #1e2a40;
+    --borda: rgb(255 255 255 / 0.08);
     --tinta: #e8eefb;
     --suave: #94a3bd;
     --marca: #5b93ff;
@@ -61,6 +91,16 @@
     --atencao: #fbbf24;
     --destrutivo: #f87171;
     --sobreposicao: rgb(0 0 0 / 0.6);
+
+    --vidro: rgb(14 22 38 / 0.62);
+    --vidro-alto: rgb(14 22 38 / 0.84);
+    --aro: rgb(255 255 255 / 0.16);
+    --aro-fim: rgb(255 255 255 / 0.04);
+    --sombra-vidro: 0 12px 32px -14px rgb(0 0 0 / 0.6), 0 1px 0 rgb(255 255 255 / 0.06) inset;
+    --luz-1: color-mix(in srgb, var(--marca) 18%, transparent);
+    --luz-2: rgb(255 255 255 / 0.04);
+    --brilho: rgb(255 255 255 / 0.1);
+    --halo: color-mix(in srgb, var(--marca) 30%, transparent);
 
     --sombra-p: 0 1px 2px rgb(0 0 0 / 0.5);
     --sombra-m: 0 8px 24px -8px rgb(0 0 0 / 0.6);
@@ -86,6 +126,8 @@
   --color-atencao: var(--atencao);
   --color-destrutivo: var(--destrutivo);
   --color-sobreposicao: var(--sobreposicao);
+  --color-vidro: var(--vidro);
+  --color-vidro-alto: var(--vidro-alto);
 
   --radius-p: var(--raio-p);
   --radius-m: var(--raio-m);

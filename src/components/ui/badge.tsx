@@ -10,23 +10,23 @@ import { cn } from "../../lib/utils.ts";
  *   <Badge variant="warning">Aguardando</Badge>
  *   <Badge variant="destructive">Cancelado</Badge>
  *
- * As cores saem dos tokens de estado: success = `--positivo`,
- * warning = `--atencao`, destructive = `--destrutivo`. As três são preenchidas
- * (fundo forte + `--marca-tinta`) porque a versão desbotada não alcança o
- * contraste mínimo de leitura no tema claro.
- * Cor nunca é a única pista: o texto da etiqueta já diz o estado.
+ * Status é SUSSURRADO: um ponto colorido e a palavra em texto normal, nunca
+ * uma pílula cheia de cor gritando na tabela. As cores do ponto saem dos
+ * tokens de estado: success = `--positivo`, warning = `--atencao`,
+ * destructive = `--destrutivo`. Cor nunca é a única pista: o texto da
+ * etiqueta já diz o estado.
  */
 export const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center gap-1.5 rounded-total border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap [&_svg]:size-3 [&_svg]:shrink-0",
+  "inline-flex w-fit shrink-0 items-center gap-1.5 rounded-total text-xs font-medium whitespace-nowrap [&_svg]:size-3 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-marca text-marca-tinta",
-        secondary: "border-transparent bg-marca/10 text-tinta",
-        outline: "border-borda bg-superficie text-suave",
-        success: "border-transparent bg-positivo text-marca-tinta",
-        warning: "border-transparent bg-atencao text-marca-tinta",
-        destructive: "border-transparent bg-destrutivo text-marca-tinta",
+        default: "bg-marca/10 px-2.5 py-0.5 text-marca",
+        secondary: "bg-tinta/6 px-2.5 py-0.5 text-tinta",
+        outline: "vidro px-2.5 py-0.5 text-suave",
+        success: "text-tinta before:size-1.5 before:shrink-0 before:rounded-total before:bg-positivo before:content-['']",
+        warning: "text-tinta before:size-1.5 before:shrink-0 before:rounded-total before:bg-atencao before:content-['']",
+        destructive: "text-tinta before:size-1.5 before:shrink-0 before:rounded-total before:bg-destrutivo before:content-['']",
       },
     },
     defaultVariants: { variant: "default" },

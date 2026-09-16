@@ -63,12 +63,12 @@ export function CampoDeTexto({
         {...props}
       />
       {dica ? (
-        <p id={idDaDica} className="text-sm text-suave">
+        <p id={idDaDica} className="text-base text-suave">
           {dica}
         </p>
       ) : null}
       {erro ? (
-        <p id={idDoErro} className="text-sm text-destrutivo">
+        <p id={idDoErro} className="text-base text-destrutivo">
           {erro}
         </p>
       ) : null}

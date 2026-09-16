@@ -15,9 +15,130 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* A ATMOSFERA: duas luzes suaves atrás de todo o app. É o que o vidro
+     desfoca; sem ela o vidro não tem o que mostrar. Fixa e sem interação. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 8% 0%, var(--luz-1), transparent 70%),
+      radial-gradient(50% 45% at 100% 100%, var(--luz-1), transparent 70%),
+      radial-gradient(45% 40% at 60% 30%, var(--luz-2), transparent 70%);
+  }
+
   /* Anel de foco visível e consistente em tudo que recebe teclado. */
   :focus-visible {
     outline: 2px solid var(--marca);
     outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--marca) 22%, transparent);
+  }
+
+  /* Com movimento reduzido ligado no aparelho, nada se move. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* VIDRO: superfície translúcida + aro de luz + desfoque + sombra.
+     Sem borda desenhada — o aro e a sombra separam. Herda o raio do elemento.
+     `vidro` para cartão, campo e barra; `vidro-alto` para o que fica por cima
+     de tudo (barra lateral, diálogo, menu). */
+  .vidro,
+  .vidro-alto {
+    position: relative;
+    isolation: isolate;
+    background: var(--vidro);
+    box-shadow: var(--sombra-vidro);
+    -webkit-backdrop-filter: blur(var(--desfoque)) saturate(1.4);
+    backdrop-filter: blur(var(--desfoque)) saturate(1.4);
+  }
+
+  .vidro-alto {
+    background: var(--vidro-alto);
+  }
+
+  .vidro::before,
+  .vidro-alto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(160deg, var(--aro), var(--aro-fim) 60%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* CAMPO: fundo leve, fio no lugar da borda, halo no foco, erro em vermelho. */
+  .campo {
+    background: color-mix(in srgb, var(--superficie) 72%, transparent);
+    box-shadow: inset 0 0 0 1px var(--borda);
+    transition:
+      box-shadow var(--t-rapido) var(--curva),
+      background-color var(--t-rapido) var(--curva);
+  }
+
+  @media (hover: hover) {
+    .campo:hover {
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tinta) 18%, transparent);
+    }
+  }
+
+  .campo:focus-visible,
+  .campo:focus-within {
+    outline: none;
+    background: var(--superficie);
+    box-shadow:
+      inset 0 0 0 1px var(--marca),
+      0 0 0 4px var(--halo);
+  }
+
+  .campo[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 1px var(--destrutivo);
+  }
+
+  /* ALVO DE TOQUE: 44px em tela de toque, sem mudar nada no computador. */
+  @media (pointer: coarse) {
+    .toque {
+      min-height: 44px;
+    }
+  }
+
+  /* SURGIR: a entrada curta de menu e diálogo. */
+  .surgir {
+    animation: surgir var(--t-suave) var(--curva);
+  }
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

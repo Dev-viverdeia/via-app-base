@@ -36,22 +36,27 @@ async function sair() {
   }
 }
 
+/** O item da navegação lateral: pílula suave, ativo na cor da marca. */
+const ITEM_LATERAL =
+  "flex items-center gap-3 rounded-m px-3 py-2.5 text-[15px] font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] toque";
+
 /**
- * Moldura do app: barra lateral fixa no desktop, barra inferior no celular,
- * e no meio a área de conteúdo onde cada página entra (começando pelo
- * `PageHeader`). Cores, raios e sombras vêm todos dos tokens.
+ * Moldura do app: barra lateral de vidro flutuando no desktop, barra
+ * inferior de vidro no celular, e no meio a área de conteúdo onde cada
+ * página entra (começando pelo `PageHeader`). Cores, raios e sombras vêm
+ * todos dos tokens; o vidro, de `globals.css`.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh">
-      {/* --- Desktop: barra lateral fixa --------------------------------- */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-borda bg-superficie md:flex">
-        <p className="flex h-16 shrink-0 items-center px-6 text-lg font-bold tracking-tight text-marca">
+      {/* --- Desktop: barra lateral de vidro, solta da borda ------------- */}
+      <aside className="fixed inset-y-3 left-3 z-30 hidden w-60 flex-col rounded-g vidro-alto md:flex">
+        <p className="flex h-16 shrink-0 items-center px-5 text-[17px] font-semibold tracking-tight text-tinta">
           {NOME_DO_APP}
         </p>
         <nav
           aria-label="Navegação principal"
-          className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-6"
+          className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4"
         >
           {ITENS_DA_NAVEGACAO.map((pagina) => (
             <NavLink
@@ -60,10 +65,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               end={pagina.rota === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-m px-3 py-2 text-sm font-medium transition-colors",
+                  ITEM_LATERAL,
                   isActive
-                    ? "bg-marca text-marca-tinta shadow-p"
-                    : "text-suave hover:bg-fundo hover:text-tinta",
+                    ? "bg-marca/10 font-semibold text-tinta [&>svg]:text-marca"
+                    : "text-suave hover:bg-tinta/5 hover:text-tinta",
                 )
               }
             >
@@ -75,11 +80,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Rodapé da barra lateral: a saída fica longe da navegação, no canto
             de baixo, onde ninguém clica sem querer. */}
-        <div className="shrink-0 border-t border-borda p-3">
+        <div className="shrink-0 p-3">
           <button
             type="button"
             onClick={sair}
-            className="flex w-full items-center gap-3 rounded-m px-3 py-2 text-sm font-medium text-suave transition-colors hover:bg-fundo hover:text-tinta"
+            className={cn(ITEM_LATERAL, "w-full text-suave hover:bg-tinta/5 hover:text-tinta")}
           >
             <LogOut className="size-5 shrink-0" aria-hidden="true" />
             Sair
@@ -88,16 +93,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* --- Conteúdo da página ------------------------------------------ */}
-      <div className="md:pl-64">
-        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-28 md:px-8 md:py-10">
+      <div className="md:pl-[16.5rem]">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-32 md:px-8 md:py-10">
           {children}
         </main>
       </div>
 
-      {/* --- Celular: barra inferior -------------------------------------- */}
+      {/* --- Celular: barra inferior de vidro ----------------------------- */}
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-30 flex border-t border-borda bg-superficie pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="fixed inset-x-3 bottom-3 z-30 flex rounded-total vidro-alto p-1 md:hidden"
+        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         {ITENS_DA_NAVEGACAO.map((pagina) => (
           <NavLink
@@ -106,8 +112,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             end={pagina.rota === "/"}
             className={({ isActive }) =>
               cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium transition-colors",
-                isActive ? "text-marca" : "text-suave",
+                "flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-total py-1.5 text-[11px] font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)]",
+                isActive ? "bg-marca/10 font-semibold text-tinta [&>svg]:text-marca" : "text-suave",
               )
             }
           >
@@ -121,7 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={sair}
-          className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium text-suave transition-colors"
+          className="flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-total py-1.5 text-[11px] font-medium text-suave"
         >
           <LogOut className="size-5 shrink-0" aria-hidden="true" />
           Sair

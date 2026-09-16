@@ -27,7 +27,7 @@ export function TabsList({
   return (
     <TabsPrimitive.List
       className={cn(
-        "inline-flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-m border border-borda bg-fundo p-1",
+        "inline-flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-total bg-tinta/5 p-1",
         className,
       )}
       {...props}
@@ -42,9 +42,9 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "inline-flex flex-1 items-center justify-center gap-2 rounded-p px-3 py-1.5 whitespace-nowrap",
-        "text-sm font-medium text-suave transition-colors hover:text-tinta",
-        "data-[state=active]:bg-superficie data-[state=active]:text-tinta data-[state=active]:shadow-p",
+        "toque inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-total px-3.5 whitespace-nowrap",
+        "text-sm font-medium text-suave transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta",
+        "data-[state=active]:bg-superficie data-[state=active]:text-tinta data-[state=active]:shadow-m",
         "disabled:pointer-events-none disabled:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
         className,

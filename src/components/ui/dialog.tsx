@@ -40,7 +40,7 @@ function DialogOverlay({
 }: ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
-      className={cn("fixed inset-0 z-50 bg-sobreposicao", className)}
+      className={cn("fixed inset-0 z-50 bg-sobreposicao backdrop-blur-sm", className)}
       {...props}
     />
   );
@@ -56,14 +56,17 @@ export function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-4",
-          "max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-g border border-borda bg-superficie p-6 text-tinta shadow-g",
+          "surgir vidro-alto fixed z-50 flex flex-col gap-4 overflow-y-auto p-6 text-tinta",
+          // Computador: centrado. Celular: folha que sobe do fundo, com a
+          // largura toda e o respiro da barra do sistema.
+          "sm:top-1/2 sm:left-1/2 sm:w-[calc(100%-2rem)] sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-g sm:max-h-[calc(100dvh-2rem)]",
+          "max-sm:inset-x-0 max-sm:bottom-0 max-sm:max-h-[calc(100dvh-3rem)] max-sm:rounded-t-g max-sm:pb-[max(1.5rem,env(safe-area-inset-bottom))]",
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-p p-1 text-suave transition-colors hover:bg-marca/10 hover:text-tinta">
+        <DialogPrimitive.Close className="absolute top-4 right-4 flex size-9 items-center justify-center rounded-total text-suave transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-tinta/5 hover:text-tinta">
           <X className="size-4" aria-hidden="true" />
           <span className="sr-only">Fechar</span>
         </DialogPrimitive.Close>
@@ -115,7 +118,7 @@ export function DialogDescription({
 }: ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("text-sm text-pretty text-suave", className)}
+      className={cn("text-base text-pretty text-suave", className)}
       {...props}
     />
   );

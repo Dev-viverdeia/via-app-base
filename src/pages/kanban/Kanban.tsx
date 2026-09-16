@@ -204,20 +204,19 @@ const ondeOCartaoCai: CollisionDetection = (args) =>
    Peças do quadro.
 ------------------------------------------------------------------------- */
 
-const CLASSE_DO_CARTAO =
-  "rounded-m border border-borda bg-superficie p-3 text-left shadow-p";
+const CLASSE_DO_CARTAO = "rounded-m vidro p-3.5 text-left";
 
 /** O miolo do cartão, usado na coluna e também na cópia que segue o cursor. */
 function ConteudoDoCartao({ cartao }: { cartao: Cartao }) {
   return (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-balance text-tinta">
+        <p className="text-base font-semibold text-balance text-tinta">
           {cartao.cliente}
         </p>
         <GripVertical className="size-4 shrink-0 text-suave" aria-hidden="true" />
       </div>
-      <p className="mt-1.5 text-base font-bold text-tinta tabular-nums">
+      <p className="mt-1.5 text-lg font-semibold text-tinta tabular-nums">
         {emReais(cartao.valor)}
       </p>
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
@@ -260,7 +259,7 @@ function CartaoArrastavel({ cartao }: { cartao: Cartao }) {
         {...listeners}
         className={cn(
           CLASSE_DO_CARTAO,
-          "w-full cursor-grab transition-colors hover:border-marca/40",
+          "w-full cursor-grab transition-[box-shadow,opacity] duration-[var(--t-rapido)] ease-[var(--curva)] hover:shadow-m",
           // Enquanto arrasta, o original desbota: quem se move é a cópia.
           isDragging && "opacity-40",
         )}
@@ -286,7 +285,7 @@ function ColunaDoFunil({
     <section className="flex w-72 shrink-0 flex-col gap-3 lg:w-auto">
       <div className="px-1">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-tinta">{coluna.titulo}</h2>
+          <h2 className="text-base font-semibold text-tinta">{coluna.titulo}</h2>
           <Badge variant="secondary">
             {cartoes.length}
             <span className="sr-only">
@@ -294,7 +293,7 @@ function ColunaDoFunil({
             </span>
           </Badge>
         </div>
-        <p className="mt-0.5 text-xs text-suave tabular-nums">
+        <p className="mt-0.5 text-sm text-suave tabular-nums">
           {emReais(total)}
         </p>
       </div>
@@ -302,8 +301,8 @@ function ColunaDoFunil({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex min-h-40 flex-1 flex-col rounded-g border p-3 transition-colors",
-          isOver ? "border-marca bg-marca/10" : "border-borda bg-marca/5",
+          "flex min-h-40 flex-1 flex-col rounded-g p-3 transition-[background-color,box-shadow] duration-[var(--t-rapido)] ease-[var(--curva)]",
+          isOver ? "bg-marca/10 ring-1 ring-marca/40" : "bg-tinta/[0.035]",
         )}
       >
         {cartoes.length === 0 ? (
@@ -311,7 +310,8 @@ function ColunaDoFunil({
             icone={Inbox}
             titulo="Coluna vazia"
             descricao="Arraste um cartão de outra coluna para cá."
-            className="flex-1 border-none bg-transparent px-3 py-6"
+            plano
+            className="flex-1 px-3 py-6"
           />
         ) : (
           // `flex flex-col` e não `grid`: numa grade, o cartão mais largo
@@ -433,8 +433,10 @@ export default function Kanban() {
         onDragEnd={aoSoltar}
         onDragCancel={() => setArrastando(null)}
       >
-        {/* No celular as colunas rolam de lado; a partir do lg elas viram grade. */}
-        <div className="flex gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-2 lg:overflow-visible xl:grid-cols-4">
+        {/* No celular as colunas rolam de lado; a partir do lg elas viram grade.
+            `relative` segura dentro do recorte o texto só de leitor de tela das
+            colunas fora da vista — sem ele, a página inteira esticava de lado. */}
+        <div className="relative flex gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-2 lg:overflow-visible xl:grid-cols-4">
           {COLUNAS.map((coluna) => (
             <ColunaDoFunil
               key={coluna.id}
@@ -453,7 +455,7 @@ export default function Kanban() {
             <div
               className={cn(
                 CLASSE_DO_CARTAO,
-                "w-full cursor-grabbing border-marca shadow-g",
+                "w-full cursor-grabbing shadow-g",
               )}
             >
               <ConteudoDoCartao cartao={arrastando} />

@@ -18,9 +18,23 @@ Regras que valem para TODO o arquivo que você tocar:
 - **Cores, raios e sombras SÓ pelos tokens** (`src/styles/tokens.css`) — nunca um hex, `rgb()` ou classe de paleta solta. É isso que faz o app inteiro trocar de tema e de marca de uma vez.
 - **Você não tem terminal.** Nada de `npm install`, `npm run`, `tsc`. O build não checa tipos e você não consegue compilar para conferir — então escreva com cuidado redobrado: confira nomes de props no arquivo do componente antes de usar, siga os exemplos dos cabeçalhos-doc, e prefira mudanças pequenas e verificáveis a reescritas grandes.
 
+## Vidro por padrão (a régua visual dos apps)
+
+O kit já nasce premium: superfícies de vidro (translúcidas, com aro de luz, sem borda desenhada) sobre uma atmosfera de luz, botões em pílula, campos com halo no foco, status sussurrado (ponto + palavra). O seu trabalho é COMPOR com ele, não redesenhá-lo:
+
+- **Superfície = `Card`** (ou as classes `vidro` / `vidro-alto` num bloco seu). Nunca escreva `border`, `border-borda`, `shadow-*` ou `bg-superficie` à mão para desenhar uma caixa. `border-borda` serve só para UM fio de separação (linha de tabela, divisória), nunca para contornar.
+- **Uma ação principal por tela** (`<Button>` padrão, cheio da cor da marca). As outras são `secondary`, `outline` ou `ghost`. Dois botões cheios da marca na mesma tela é erro — inclusive repetir o mesmo botão no topo e no fim da lista.
+- **Status e etiqueta = `Badge`** (`success`, `warning` e `destructive` viram ponto colorido + palavra). Nada de pílula cheia de cor escrita à mão.
+- **Toda tela de app começa com `PageHeader`** (`titulo` e, quando ajudar, uma `descricao` de uma linha). Lista vazia = `EmptyState`.
+- **Texto corrido com 16px ou mais** (`text-base`). `text-sm` só para rótulo e meta curta (até três palavras); `text-xs` só em rótulo em caixa alta com `tracking-[0.08em]`. Nada cortado com `truncate` ou `line-clamp`: o texto quebra a linha.
+- **Título da tela:** um só `<h1>` por página — o do `PageHeader` (numa página standalone, o seu), com 40px no computador e 28px no celular. É o tamanho que o `PageHeader` já dá; não o encolha.
+- **Alvo de toque:** os controles do kit já têm 40px (44 no toque, pela classe `toque`). Não encolha botão nem campo abaixo disso.
+- **Movimento:** só transições curtas (`duration-[var(--t-rapido)] ease-[var(--curva)]`), nada em laço; menus e diálogos entram com a classe `surgir`.
+- **Cores só pelos tokens**, inclusive nas classes de vidro: `bg-vidro`, `bg-vidro-alto` existem para casos raros; o caminho normal é a classe `vidro`.
+
 ## Identidade visual: um arquivo
 
-`src/styles/tokens.css` define a identidade INTEIRA como variáveis CSS, com tema claro e escuro. **Rebrandear o app = editar esse arquivo e mais nada.** Cada token tem um comentário dizendo para que existe; ao mudar um valor, preserve a invariante que o comentário declara (ex.: `--sobreposicao` precisa ser mais escuro que `--fundo`). As classes Tailwind dos tokens (`bg-fundo`, `bg-superficie`, `border-borda`, `text-tinta`, `text-suave`, `text-marca`, `bg-marca`, `text-marca-tinta`, `text-positivo`, `text-atencao`, `text-destrutivo`, `rounded-p/m/g/total`, `shadow-p/m/g`, `bg-sobreposicao`) vêm do bloco `@theme inline` — se você precisar de um token novo, declare-o nos DOIS temas e no `@theme`, com comentário.
+`src/styles/tokens.css` define a identidade INTEIRA como variáveis CSS, com tema claro e escuro. **Rebrandear o app = editar esse arquivo e mais nada.** Cada token tem um comentário dizendo para que existe; ao mudar um valor, preserve a invariante que o comentário declara (ex.: `--sobreposicao` precisa ser mais escuro que `--fundo`). As classes Tailwind dos tokens (`bg-fundo`, `bg-superficie`, `border-borda`, `text-tinta`, `text-suave`, `text-marca`, `bg-marca`, `text-marca-tinta`, `text-positivo`, `text-atencao`, `text-destrutivo`, `bg-vidro`, `bg-vidro-alto`, `rounded-p/m/g/total`, `shadow-p/m/g`, `bg-sobreposicao`) vêm do bloco `@theme inline`; o vidro, o campo, o alvo de toque e o movimento (`vidro`, `vidro-alto`, `campo`, `toque`, `surgir`) vêm de `globals.css` — se você precisar de um token novo, declare-o nos DOIS temas e no `@theme`, com comentário.
 
 ## Como criar uma página
 

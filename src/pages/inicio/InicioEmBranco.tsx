@@ -26,7 +26,7 @@ export default function InicioEmBranco() {
       {/* Sem PageHeader e sem o nome do app: no nascimento ele ainda é um
           placeholder ("Meu app"), e a barra lateral já o exibe quando existe.
           O `<h1>` do documento é a própria boas-vindas. */}
-      <h1 className="text-2xl font-bold tracking-tight text-balance text-marca sm:text-3xl">
+      <h1 className="text-[1.75rem] font-semibold tracking-tight text-balance text-tinta sm:text-[2.5rem]">
         Seu app nasce aqui
       </h1>
 

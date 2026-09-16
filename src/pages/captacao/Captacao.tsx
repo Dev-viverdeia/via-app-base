@@ -82,7 +82,7 @@ export default function Captacao() {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
       {/* Página standalone: o `<h1>` do documento é este — não há PageHeader
           aqui para trazê-lo. */}
-      <h1 className="text-2xl font-bold tracking-tight text-marca">
+      <h1 className="text-[1.75rem] font-semibold tracking-tight text-tinta sm:text-[2.5rem]">
         {NOME_DO_APP}
       </h1>
 
@@ -170,7 +170,7 @@ export default function Captacao() {
                 )}
               </Button>
 
-              <p className="text-center text-xs text-pretty text-suave">
+              <p className="text-center text-base text-pretty text-suave">
                 Seus dados ficam só com a gente. Nada de spam.
               </p>
             </form>

@@ -26,6 +26,8 @@ type EmptyStateProps = {
   descricao: string;
   /** Opcional: o botão (ou os botões) que resolvem (ex.: "Novo cliente"). */
   acoes?: ReactNode;
+  /** Sem o vidro: para um vazio que já mora dentro de outra superfície (uma coluna, um cartão). */
+  plano?: boolean;
   className?: string;
 };
 
@@ -34,12 +36,14 @@ export function EmptyState({
   titulo,
   descricao,
   acoes,
+  plano = false,
   className,
 }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-g border border-dashed border-borda bg-superficie px-6 py-14 text-center",
+        "flex flex-col items-center justify-center gap-2 rounded-g px-6 py-14 text-center",
+        !plano && "vidro",
         className,
       )}
     >
@@ -49,7 +53,7 @@ export function EmptyState({
       <h3 className="text-base font-semibold text-balance text-tinta">
         {titulo}
       </h3>
-      <p className="max-w-sm text-sm text-pretty text-suave">{descricao}</p>
+      <p className="max-w-sm text-base text-pretty text-suave">{descricao}</p>
       {acoes ? <div className="mt-3 flex flex-wrap gap-2">{acoes}</div> : null}
     </div>
   );

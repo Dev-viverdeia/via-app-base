@@ -31,7 +31,6 @@ import {
   YAxis,
 } from "recharts";
 import { PageHeader } from "../../components/layout/PageHeader.tsx";
-import { Badge } from "../../components/ui/badge.tsx";
 import {
   Card,
   CardContent,
@@ -112,7 +111,7 @@ function Variacao({ percentual }: { percentual: number }) {
   });
 
   return (
-    <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-xs text-suave">
+    <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-sm text-suave">
       <span
         className={cn(
           "inline-flex items-center gap-1 font-semibold",
@@ -123,7 +122,7 @@ function Variacao({ percentual }: { percentual: number }) {
         {subiu ? "+" : "−"}
         {numero}%
       </span>
-      vs. 30 dias antes
+      vs. mês anterior
     </p>
   );
 }
@@ -133,7 +132,7 @@ export default function Inicio() {
     <>
       <PageHeader
         titulo="Início"
-        acoes={<Badge variant="outline">Últimos 30 dias</Badge>}
+        descricao="Como o negócio está indo nos últimos 30 dias."
       />
 
       {/* --- Os quatro indicadores -------------------------------------- */}
@@ -142,8 +141,8 @@ export default function Inicio() {
           <Card key={indicador.id}>
             <CardContent className="flex items-start justify-between gap-3 p-5">
               <div className="min-w-0">
-                <p className="text-sm text-suave">{indicador.rotulo}</p>
-                <p className="mt-1 text-2xl font-bold tracking-tight text-tinta tabular-nums">
+                <p className="text-[11px] font-semibold tracking-[0.08em] text-suave uppercase">{indicador.rotulo}</p>
+                <p className="mt-1.5 text-[1.75rem] leading-none font-semibold tracking-tight text-tinta tabular-nums">
                   {indicador.valor}
                 </p>
                 <Variacao percentual={indicador.variacao} />
@@ -231,9 +230,9 @@ export default function Inicio() {
                         margin: 0,
                         padding: "0.5rem 0.75rem",
                         backgroundColor: "var(--superficie)",
-                        border: "1px solid var(--borda)",
+                        border: 0,
                         borderRadius: "var(--raio-m)",
-                        boxShadow: "var(--sombra-m)",
+                        boxShadow: "var(--sombra-vidro)",
                         whiteSpace: "nowrap",
                       }}
                       labelStyle={{
@@ -298,14 +297,14 @@ export default function Inicio() {
                   return (
                     <li
                       key={atividade.id}
-                      className="flex items-start gap-3 rounded-m px-2 py-2.5 transition-colors hover:bg-marca/5"
+                      className="flex items-start gap-3 rounded-m px-2 py-2.5 transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-marca/5"
                     >
                       <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-total bg-marca/10 text-marca">
                         <Icone className="size-4" aria-hidden="true" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline justify-between gap-2">
-                          <p className="truncate text-sm font-medium text-tinta">
+                          <p className="text-base font-medium text-pretty text-tinta">
                             {atividade.titulo}
                           </p>
                           {/* `<time>` guarda a data exata; o texto fica curto. */}
@@ -319,7 +318,7 @@ export default function Inicio() {
                             })}
                           </time>
                         </div>
-                        <p className="truncate text-sm text-suave">
+                        <p className="text-base text-pretty text-suave">
                           {atividade.detalhe}
                         </p>
                       </div>

@@ -213,7 +213,7 @@ export default function Login() {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
       {/* Página standalone: o `<h1>` do documento é este — não há PageHeader
           aqui para trazê-lo. */}
-      <h1 className="text-2xl font-bold tracking-tight text-marca">
+      <h1 className="text-[1.75rem] font-semibold tracking-tight text-tinta sm:text-[2.5rem]">
         {NOME_DO_APP}
       </h1>
 
@@ -243,7 +243,7 @@ export default function Login() {
                 {erroEntrar ? (
                   <p
                     role="alert"
-                    className="rounded-m border border-destrutivo/40 bg-destrutivo/10 px-3 py-2 text-sm text-destrutivo"
+                    className="rounded-m bg-destrutivo/10 px-3.5 py-2.5 text-base text-destrutivo"
                   >
                     {erroEntrar}
                   </p>
@@ -293,7 +293,7 @@ export default function Login() {
                 {erroCriarConta ? (
                   <p
                     role="alert"
-                    className="rounded-m border border-destrutivo/40 bg-destrutivo/10 px-3 py-2 text-sm text-destrutivo"
+                    className="rounded-m bg-destrutivo/10 px-3.5 py-2.5 text-base text-destrutivo"
                   >
                     {erroCriarConta}
                   </p>

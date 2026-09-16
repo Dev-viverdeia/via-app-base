@@ -117,7 +117,7 @@ function CabecalhoOrdenavel({
       <button
         type="button"
         onClick={() => aoOrdenar(campo)}
-        className="inline-flex items-center gap-1.5 rounded-p text-xs font-semibold tracking-wide uppercase transition-colors hover:text-tinta"
+        className="toque inline-flex h-10 items-center gap-1.5 rounded-p text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta"
       >
         {children}
         <Icone
@@ -248,6 +248,7 @@ export default function Tabela() {
     <>
       <PageHeader
         titulo="Clientes"
+        descricao="Quem compra de você, com contato e histórico."
         acoes={
           <Button onClick={abrirNovo}>
             <Plus />
@@ -275,7 +276,7 @@ export default function Tabela() {
             className="pl-9"
           />
         </div>
-        <p role="status" className="text-sm text-suave tabular-nums">
+        <p role="status" className="text-base text-suave tabular-nums">
           {contagem}
         </p>
       </div>
@@ -307,7 +308,7 @@ export default function Tabela() {
           />
         )
       ) : (
-        <Card className="p-2">
+        <Card className="p-2 sm:p-3">
           <Table>
             <TableHeader>
               <TableRow>
