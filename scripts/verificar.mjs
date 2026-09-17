@@ -475,12 +475,33 @@ const bloco = lerBlocoDoRegistro();
 const pkg = lerPackageJson();
 const malformadas = bloco.erro ? new Map() : acharLinhasMalformadas(bloco);
 
+/**
+ * Check 6 (17/09/2026): a página de não-encontrado carrega a marca da plataforma.
+ *
+ * O inspetor da plataforma lê `data-via-pagina="nao-encontrada"` para saber
+ * que a raiz `/` abriu a página de erro (e não a primeira tela). Só cobra a
+ * marca enquanto o app ainda tem a rota `*` ou o componente do template; um
+ * roteador trocado de propósito não reprova.
+ */
+function checarPaginaNaoEncontrada() {
+  const app = lerTextoOuNulo("src/App.tsx");
+  if (app === null) return ["src/App.tsx não existe (ou não pôde ser lido)."];
+  const temRota = app.includes('<Route path="*"') || app.includes("PaginaNaoEncontrada");
+  if (!temRota) return [];
+  if (app.includes('data-via-pagina="nao-encontrada"')) return [];
+  return [
+    'A página de não-encontrado perdeu a marca `data-via-pagina="nao-encontrada"` no seu <main>. ' +
+      "É por ela que a plataforma sabe que a entrada do app abriu a página de erro; devolva a marca.",
+  ];
+}
+
 const checks = [
   { nome: "registro ↔ pastas em src/pages (bijeção)", erros: checarBijecaoRegistroPastas(bloco, malformadas) },
   { nome: "uma linha por página, no formato do registro", erros: checarUmaLinhaPorPagina(bloco, malformadas) },
   { nome: 'script de build === "vite build"', erros: checarScriptDeBuild(pkg) },
   { nome: "dependências em versão exata (sem ^ ou ~)", erros: checarVersoesExatas(pkg) },
   { nome: `CLAUDE.md existe e cabe em ${LIMITE_CLAUDE_MD.toLocaleString("pt-BR")} caracteres`, erros: checarClaudeMd() },
+  { nome: 'página de não-encontrado com a marca da plataforma (data-via-pagina="nao-encontrada")', erros: checarPaginaNaoEncontrada() },
 ];
 
 console.log("Verificador estrutural do template via-app-base");

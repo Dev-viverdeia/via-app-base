@@ -57,7 +57,10 @@ function Rota({ pagina }: { pagina: PaginaDoApp }) {
  */
 function PaginaNaoEncontrada() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 py-10 text-center">
+    <main
+      className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 py-10 text-center"
+      data-via-pagina="nao-encontrada"
+    >
       <p className="text-sm font-medium text-suave">Erro 404</p>
       <h1 className="text-2xl font-bold tracking-tight text-balance text-tinta sm:text-3xl">
         Página não encontrada
