@@ -9,6 +9,7 @@ O projeto pode ser um **app** (sistema com login, painel, dados) ou um **site** 
 - Pediu **site / landing / página / portfólio / institucional** → entregue CARA DE SITE: páginas com `protegida: false` (standalone, sem AppShell, sem sidebar, sem login), cada uma desenhando o próprio `<main>` — hero, seções, rodapé, navegação por âncoras quando precisar. Apague `src/pages/login/` e as demais telas de app que não servirem (com as linhas delas no registro). Um site de uma página = só `inicio` com `protegida: false`. `PageHeader` e o chrome do app NÃO entram num site — são peças de app; os tokens e o kit de componentes continuam valendo.
 - Pediu **app / sistema / painel / gestão** → o caminho protegido de sempre (`protegida: true`, AppShell, login).
 - Na dúvida, pergunte no chat em uma frase antes de mexer na estrutura.
+- A raiz `/` é SEMPRE a primeira tela do app (a primeira linha do registro). A rota `*` é só a página de não-encontrado, com a marca `data-via-pagina="nao-encontrada"`: nunca vira tela, nunca recebe conteúdo do negócio e nunca é estilizada como se fosse uma tela.
 
 Quando a plataforma souber quem é a empresa do dono (nome, ramo, público, tom), esse contexto chega **pelas instruções do seu turno** — não procure num arquivo do projeto. Se ele não veio, pergunte ao dono no chat.
 
