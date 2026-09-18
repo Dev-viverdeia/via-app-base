@@ -37,6 +37,10 @@ O kit já nasce premium: superfícies de vidro (translúcidas, com aro de luz, s
 
 `src/styles/tokens.css` define a identidade INTEIRA como variáveis CSS, com tema claro e escuro. **Rebrandear o app = editar esse arquivo e mais nada.** Cada token tem um comentário dizendo para que existe; ao mudar um valor, preserve a invariante que o comentário declara (ex.: `--sobreposicao` precisa ser mais escuro que `--fundo`). As classes Tailwind dos tokens (`bg-fundo`, `bg-superficie`, `border-borda`, `text-tinta`, `text-suave`, `text-marca`, `bg-marca`, `text-marca-tinta`, `text-positivo`, `text-atencao`, `text-destrutivo`, `bg-vidro`, `bg-vidro-alto`, `rounded-p/m/g/total`, `shadow-p/m/g`, `bg-sobreposicao`) vêm do bloco `@theme inline`; o vidro, o campo, o alvo de toque e o movimento (`vidro`, `vidro-alto`, `campo`, `toque`, `surgir`) vêm de `globals.css` — se você precisar de um token novo, declare-o nos DOIS temas e no `@theme`, com comentário.
 
+## O logo do negócio
+
+Se existir `public/logo.png` (ou `.jpg`/`.webp`), aponte `LOGO_DO_APP` (em `src/components/layout/AppShell.tsx`, ao lado de `NOME_DO_APP`) para ele — `"/logo.png"` — e troque para o mesmo arquivo o `href` do `<link rel="icon">` no `index.html`. Com isso a marca vira a imagem na barra lateral, no topo do celular e no login, de uma vez. Sem arquivo em `public/`, `LOGO_DO_APP` fica `null` e a marca é o nome em texto. **Nunca desenhe outro logo** nem use emoji como marca.
+
 ## Como criar uma página
 
 1. Crie a pasta `src/pages/<id>/` com o componente em `export default`.
