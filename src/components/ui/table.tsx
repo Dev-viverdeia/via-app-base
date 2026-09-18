@@ -33,7 +33,9 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
       aria-label="Tabela com rolagem horizontal"
     >
       <table
-        className={cn("w-full caption-bottom text-[15px] text-tinta", className)}
+        // 16px pela mesma razão do botão: célula com quatro palavras ou mais
+        // abaixo disso é recusa de desenho na conferência da plataforma.
+        className={cn("w-full caption-bottom text-base text-tinta", className)}
         {...props}
       />
     </div>

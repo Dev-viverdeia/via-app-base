@@ -38,7 +38,7 @@ async function sair() {
 
 /** O item da navegação lateral: pílula suave, ativo na cor da marca. */
 const ITEM_LATERAL =
-  "flex items-center gap-3 rounded-m px-3 py-2.5 text-[15px] font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] toque";
+  "flex items-center gap-3 rounded-m px-3 py-2.5 text-base font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] toque";
 
 /**
  * Moldura do app: barra lateral de vidro flutuando no desktop, barra

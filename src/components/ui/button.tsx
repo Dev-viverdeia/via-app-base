@@ -28,7 +28,12 @@ import { cn } from "../../lib/utils.ts";
 export const buttonVariants = cva(
   [
     "inline-flex shrink-0 items-center justify-center gap-2 rounded-total toque",
-    "text-[15px] font-medium whitespace-nowrap",
+    // 16px, NÃO 15: a régua da plataforma recusa texto corrido de quatro
+    // palavras ou mais abaixo de 16px, e rótulo de botão passa dessas quatro
+    // palavras o tempo todo ("Voltar para o início"). Com 15px aqui, qualquer
+    // app nascido deste template levava uma recusa de desenho na primeira
+    // conferência — e o conserto era pago uma vez por app.
+    "text-base font-medium whitespace-nowrap",
     "transition-[background-color,color,box-shadow,transform,filter] duration-[var(--t-rapido)] ease-[var(--curva)]",
     "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
