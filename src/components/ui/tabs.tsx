@@ -35,12 +35,21 @@ export function TabsList({
   );
 }
 
+/**
+ * A ABA CARREGA O `data-value` DELA, pela mesma razão do `SelectItem`: o Radix
+ * esconde o valor num `id` com prefixo sorteado (`radix-_r_0_-trigger-entrar`),
+ * que ninguém consegue escrever num seletor. `[role="tab"][data-value="entrar"]`
+ * é o palpite natural de quem confere — aqui ele existe.
+ */
 export function TabsTrigger({
   className,
+  value,
   ...props
 }: ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
+      value={value}
+      data-value={value}
       className={cn(
         "toque inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-total px-3.5 whitespace-nowrap",
         "text-sm font-medium text-suave transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta",
@@ -56,9 +65,15 @@ export function TabsTrigger({
 
 export function TabsContent({
   className,
+  value,
   ...props
 }: ComponentProps<typeof TabsPrimitive.Content>) {
   return (
-    <TabsPrimitive.Content className={cn("mt-4", className)} {...props} />
+    <TabsPrimitive.Content
+      value={value}
+      data-value={value}
+      className={cn("mt-4", className)}
+      {...props}
+    />
   );
 }

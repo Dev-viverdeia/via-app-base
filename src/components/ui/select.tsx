@@ -94,15 +94,30 @@ export function SelectLabel({
   );
 }
 
+/**
+ * A OPÇÃO CARREGA O `data-value` DELA (18/09).
+ *
+ * O Radix desenha o item como `role="option"` e NÃO põe o valor em lugar
+ * nenhum do DOM: sobra o texto visível. A conferência da plataforma escreve
+ * `[role="option"][data-value="entregue"]` — o seletor natural, o que qualquer
+ * um chuta —, não achava nada, e o pedido "tela de pedidos com filtro por
+ * status" caiu três medições seguidas sempre no mesmo passo. Com esta linha o
+ * palpite natural passa a ser verdade.
+ */
 export function SelectItem({
   className,
   children,
+  value,
   ...props
 }: ComponentProps<typeof SelectPrimitive.Item>) {
   return (
     <SelectPrimitive.Item
+      value={value}
+      data-value={value}
       className={cn(
-        "relative flex w-full cursor-default items-center rounded-p py-2 pr-8 pl-3 text-[15px] outline-hidden select-none",
+        // 16px: opção com quatro palavras ou mais ("Todos os pedidos abertos")
+        // abaixo disso é recusa de desenho na conferência da plataforma.
+        "relative flex w-full cursor-default items-center rounded-p py-2 pr-8 pl-3 text-base outline-hidden select-none",
         "data-[highlighted]:bg-marca/10 data-[highlighted]:text-tinta",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
