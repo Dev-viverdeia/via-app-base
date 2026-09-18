@@ -12,6 +12,15 @@ import { cn } from "../../lib/utils.ts";
  */
 export const NOME_DO_APP = "Meu app";
 
+/**
+ * O logo do negócio, quando existe um arquivo em `public/`. Aponte para ele
+ * (`"/logo.png"`, `"/logo.jpg"` ou `"/logo.webp"`) e a marca vira a imagem na
+ * moldura e no login; em `null`, fica o nome em texto. É constante, e não uma
+ * busca pelo arquivo, porque `public/` não passa pelo empacotador: procurar em
+ * tempo de execução faria a marca piscar de texto para imagem a cada abertura.
+ */
+export const LOGO_DO_APP: string | null = null;
+
 /** A navegação é o registro de páginas: nada de menu escrito na mão. */
 const ITENS_DA_NAVEGACAO = PAGINAS.filter((pagina) => pagina.naNavbar);
 
@@ -51,9 +60,24 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh">
       {/* --- Desktop: barra lateral de vidro, solta da borda ------------- */}
       <aside className="fixed inset-y-3 left-3 z-30 hidden w-60 flex-col rounded-g vidro-alto md:flex">
-        <p className="flex h-16 shrink-0 items-center px-5 text-[17px] font-semibold tracking-tight text-tinta">
-          {NOME_DO_APP}
-        </p>
+        {/* A marca. O logo entra NO LUGAR do nome, não ao lado: logo de
+            negócio quase sempre já traz o nome desenhado, e os dois juntos
+            escreveriam a marca duas vezes na mesma linha. A faixa tem altura
+            fixa nos dois casos, para a navegação não pular quando um projeto
+            ganha logo. */}
+        <div className="flex h-16 shrink-0 items-center px-5">
+          {LOGO_DO_APP ? (
+            <img
+              src={LOGO_DO_APP}
+              alt={NOME_DO_APP}
+              className="h-9 w-auto max-w-full object-contain object-left"
+            />
+          ) : (
+            <p className="text-[17px] font-semibold tracking-tight text-tinta">
+              {NOME_DO_APP}
+            </p>
+          )}
+        </div>
         <nav
           aria-label="Navegação principal"
           className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 pb-4"
@@ -94,6 +118,19 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* --- Conteúdo da página ------------------------------------------ */}
       <div className="md:pl-[16.5rem]">
+        {/* No celular a barra lateral some, e com ela a marca — então o logo
+            reaparece aqui, acima do título da tela. Sem logo não nasce faixa
+            nenhuma: o nome em texto aqui só repetiria, em letra menor, o que o
+            título da tela já diz. */}
+        {LOGO_DO_APP ? (
+          <header className="px-4 pt-6 md:hidden">
+            <img
+              src={LOGO_DO_APP}
+              alt={NOME_DO_APP}
+              className="h-8 w-auto max-w-[60%] object-contain object-left"
+            />
+          </header>
+        ) : null}
         <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-32 md:px-8 md:py-10">
           {children}
         </main>

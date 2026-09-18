@@ -10,7 +10,7 @@ import {
   type AuthError,
   type Session,
 } from "@supabase/supabase-js";
-import { NOME_DO_APP } from "../../components/layout/AppShell.tsx";
+import { LOGO_DO_APP, NOME_DO_APP } from "../../components/layout/AppShell.tsx";
 import { Button } from "../../components/ui/button.tsx";
 import { CampoDeTexto } from "../../components/ui/campo-de-texto.tsx";
 import {
@@ -212,9 +212,19 @@ export default function Login() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
       {/* Página standalone: o `<h1>` do documento é este — não há PageHeader
-          aqui para trazê-lo. */}
+          aqui para trazê-lo. Com logo, a imagem entra DENTRO do `<h1>` (o
+          `alt` é o nome): a página continua com um título principal, que é o
+          que a régua da casa cobra, e a marca aparece do jeito do dono. */}
       <h1 className="text-[1.75rem] font-semibold tracking-tight text-tinta sm:text-[2.5rem]">
-        {NOME_DO_APP}
+        {LOGO_DO_APP ? (
+          <img
+            src={LOGO_DO_APP}
+            alt={NOME_DO_APP}
+            className="block h-12 w-auto max-w-[16rem] object-contain sm:h-14"
+          />
+        ) : (
+          NOME_DO_APP
+        )}
       </h1>
 
       <Card className="w-full max-w-sm">
