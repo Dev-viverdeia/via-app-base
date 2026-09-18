@@ -62,7 +62,11 @@ function PaginaNaoEncontrada() {
       data-via-pagina="nao-encontrada"
     >
       <p className="text-sm font-medium text-suave">Erro 404</p>
-      <h1 className="text-2xl font-bold tracking-tight text-balance text-tinta sm:text-3xl">
+      {/* O MESMO tamanho do <h1> do login, e pela mesma razão: a régua da
+          plataforma cobra 28px no celular e 40px no computador do título
+          principal de qualquer tela. Em text-2xl/3xl esta página reprovava nos
+          dois aparelhos. */}
+      <h1 className="text-[1.75rem] font-bold tracking-tight text-balance text-tinta sm:text-[2.5rem]">
         Página não encontrada
       </h1>
       <p className="max-w-sm text-pretty text-suave">
