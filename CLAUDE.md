@@ -59,6 +59,16 @@ Convenção de nomes: os **primitivos têm API em inglês** (`variant`, `size` �
 
 **Ícones: NUNCA importe ícones de marca do `lucide-react`.** Ícones de redes sociais e marcas — `Instagram`, `Facebook`, `Twitter`, `Youtube`, `Linkedin`, `Github`, `Whatsapp` e afins — **não existem** neste pacote (foram removidos por marca registrada) e importar qualquer um deles **quebra o site inteiro numa tela em branco**, sem erro visível. Para contato e redes sociais use `AtSign`, `Mail`, `Phone`, `MessageCircle`, `Send`, `Link` ou `Share2`, ou um link de texto simples (`<a href="https://instagram.com/...">Instagram</a>`). Na dúvida sobre um ícone existir, use um genérico seguro (`Circle`, `Star`, `Heart`) em vez de arriscar um nome de marca.
 
+### Como conferir estes componentes
+
+A plataforma confere o app num navegador de verdade, e o passo só acha o que EXISTE no DOM. Os ganchos estáveis do kit:
+
+- **Select:** clique no gatilho pelo `id` que você deu (`#filtro-de-status`) e depois na opção por `[role="option"][data-value="entregue"]` — o `data-value` é o `value` do `SelectItem`.
+- **Abas:** `[role="tab"][data-value="…"]` e `[role="tabpanel"][data-value="…"]` (o `id` do Radix tem prefixo sorteado; não dá para escrever).
+- **Diálogo:** `[role="dialog"]`, título em `[role="dialog"] h2`. **Linha de tabela e cartão do kanban não têm id** — ache pelo texto.
+- **Confirmação de ação é `toast`**, desenhado fora do `<main>`: confira pelo texto, que a plataforma procura também nos avisos flutuantes.
+- **Um seletor tem que casar com UM elemento.** `[role="option"]` sozinho casa com a lista toda e a conferência falha por ambiguidade — sempre qualifique com `[data-value="…"]`.
+
 - Precisa de um visual novo? **Crie uma variante no componente existente** (cva) em vez de duplicar o arquivo ou estilizar por fora.
 - Campo de formulário = `CampoDeTexto` — ele já liga `label`, `id`, `aria-invalid` e `aria-describedby` entre si. Não escreva esse quarteto à mão.
 - Todo estado vazio usa `EmptyState` (com ação quando houver o que fazer). Toda ação que salva/exclui confirma com `toast` do sonner, em frase neutra de gênero ("X entrou na lista", não "X foi cadastrado").
