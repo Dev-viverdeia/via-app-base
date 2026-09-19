@@ -9,7 +9,7 @@
 import { lazy } from "react";
 import type { ComponentType, LazyExoticComponent } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Kanban, LayoutDashboard, LogIn, UserPlus, Users } from "lucide-react";
+import { Kanban, KeyRound, LayoutDashboard, LogIn, UserPlus, Users } from "lucide-react";
 
 export type PaginaDoApp = {
   id: string;            // = nome da pasta em src/pages/<id>
@@ -31,5 +31,6 @@ export const PAGINAS: PaginaDoApp[] = [
   { id: "tabela", titulo: "Clientes", rota: "/tabela", icone: Users, pagina: lazy(() => import("./pages/tabela/Tabela")), naNavbar: true, protegida: true },
   { id: "login", titulo: "Entrar", rota: "/login", icone: LogIn, pagina: lazy(() => import("./pages/login/Login")), naNavbar: false, protegida: false },
   { id: "captacao", titulo: "Captação", rota: "/captacao", icone: UserPlus, pagina: lazy(() => import("./pages/captacao/Captacao")), naNavbar: false, protegida: false },
+  { id: "redefinir-senha", titulo: "Senha nova", rota: "/redefinir-senha", icone: KeyRound, pagina: lazy(() => import("./pages/redefinir-senha/RedefinirSenha")), naNavbar: false, protegida: false },
   // </via:paginas>
 ];
