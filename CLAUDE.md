@@ -41,6 +41,10 @@ O kit já nasce premium: superfícies de vidro (translúcidas, com aro de luz, s
 
 Se existir `public/logo.png` (ou `.jpg`/`.webp`), aponte `LOGO_DO_APP` (em `src/components/layout/AppShell.tsx`, ao lado de `NOME_DO_APP`) para ele — `"/logo.png"` — e troque para o mesmo arquivo o `href` do `<link rel="icon">` no `index.html`. Com isso a marca vira a imagem na barra lateral, no topo do celular e no login, de uma vez. Sem arquivo em `public/`, `LOGO_DO_APP` fica `null` e a marca é o nome em texto. **Nunca desenhe outro logo** nem use emoji como marca.
 
+## O cartão do link compartilhado
+
+O `index.html` já traz `description`, `og:title`, `og:description`, `og:image` e `twitter:card` — é o que aparece quando o dono cola o endereço no WhatsApp ou no LinkedIn. O título e a imagem a plataforma acerta sozinha; **a descrição é genérica e você deve reescrevê-la** com o que este app faz, em uma frase, nas duas linhas em que ela aparece.
+
 ## Como criar uma página
 
 1. Crie a pasta `src/pages/<id>/` com o componente em `export default`.
@@ -89,7 +93,7 @@ A plataforma confere o app num navegador de verdade, e o passo só acha o que EX
 - `src/lib/supabase.ts` é o ÚNICO cliente. Não crie outro, não mude as env vars, e **nunca leia nem edite `.env`** — as chaves chegam pelo ambiente da plataforma.
 - **Tabela, coluna, policy ou function novas: SÓ pelo fluxo de migração da plataforma** (você propõe a migração no chat; o dono aprova antes de aplicar). Nunca invente outra via.
 - **Toda tabela nasce com política RLS.** Sem RLS, o link público do preview dá acesso ao banco do dono — é o pior erro possível neste projeto. Se a tela é pública (ex.: captação gravando em `leads`), a política é de INSERT anônimo estrito; leitura fica para usuários autenticados.
-- Login, cadastro e a guarda de sessão (`RequerSessao`) já existem e funcionam com o Supabase do dono. Não reimplemente autenticação.
+- Login, cadastro, **recuperação de senha** (link "Esqueci minha senha" no login + a página `/redefinir-senha`) e a guarda de sessão (`RequerSessao`) já existem e funcionam com o Supabase do dono. Não reimplemente autenticação.
 - **Modo de demonstração** (`src/lib/demonstracao.ts`): no preview, quando a plataforma marca a visita com o cookie `via_demonstracao=1`, a guarda deixa entrar sem conta e as telas mostram os dados de exemplo de `src/data/demo` — é assim que a conferência automática vê as telas protegidas. Toda tela protegida nova precisa abrir nesse modo sem rede: quando `MODO_DEMONSTRACAO` for verdadeiro, mostre dados de exemplo em vez de consultar o Supabase. Nunca remova o modo nem o condicione a login; ele não existe no site publicado.
 
 ## Dependências
