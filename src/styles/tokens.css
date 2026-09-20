@@ -3,7 +3,8 @@
    Trocar a marca inteira = editar SÓ este arquivo. Nenhum componente escreve
    cor, raio ou sombra na mão: todos usam os utilitários gerados aqui embaixo
    (bg-fundo, text-tinta, border-borda, rounded-m, shadow-g, font-sans...).
-   O tema escuro segue a preferência do sistema (prefers-color-scheme).
+   O app nasce claro, independente da preferência do aparelho.
+   Tema escuro só quando o produto o escolher: data-theme="dark" no <html>.
 
    O app nasce de VIDRO: superfícies translúcidas com aro de luz e sombra
    suave sobre uma atmosfera de luz (globals.css). A linha de borda existe
@@ -12,7 +13,7 @@
 ============================================================================= */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* --- Cores: tema claro ------------------------------------------------- */
   /* Fundo da página e fundo dos cartões/painéis que ficam por cima dela. */
@@ -77,41 +78,40 @@
     "Liberation Mono", monospace;
 }
 
-/* --- Cores: tema escuro (preferência do sistema) -------------------------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fundo: #070d1a;
-    --superficie: #0e1626;
-    --borda: rgb(255 255 255 / 0.08);
-    --tinta: #e8eefb;
-    --suave: #94a3bd;
-    --marca: #5b93ff;
-    --marca-tinta: #06122b;
-    --positivo: #4ade80;
-    --atencao: #fbbf24;
-    --destrutivo: #f87171;
-    --sobreposicao: rgb(0 0 0 / 0.6);
+/* --- Tema escuro explícito: só entra quando o produto o pede ------------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --fundo: #070d1a;
+  --superficie: #0e1626;
+  --borda: rgb(255 255 255 / 0.08);
+  --tinta: #e8eefb;
+  --suave: #94a3bd;
+  --marca: #5b93ff;
+  --marca-tinta: #06122b;
+  --positivo: #4ade80;
+  --atencao: #fbbf24;
+  --destrutivo: #f87171;
+  --sobreposicao: rgb(0 0 0 / 0.6);
 
-    --vidro: rgb(14 22 38 / 0.62);
-    --vidro-alto: rgb(14 22 38 / 0.84);
-    --aro: rgb(255 255 255 / 0.16);
-    --aro-fim: rgb(255 255 255 / 0.04);
-    --sombra-vidro: 0 12px 32px -14px rgb(0 0 0 / 0.6), 0 1px 0 rgb(255 255 255 / 0.06) inset;
-    --luz-1: color-mix(in srgb, var(--marca) 18%, transparent);
-    --luz-2: rgb(255 255 255 / 0.04);
-    --brilho: rgb(255 255 255 / 0.1);
-    --halo: color-mix(in srgb, var(--marca) 30%, transparent);
+  --vidro: rgb(14 22 38 / 0.62);
+  --vidro-alto: rgb(14 22 38 / 0.84);
+  --aro: rgb(255 255 255 / 0.16);
+  --aro-fim: rgb(255 255 255 / 0.04);
+  --sombra-vidro: 0 12px 32px -14px rgb(0 0 0 / 0.6), 0 1px 0 rgb(255 255 255 / 0.06) inset;
+  --luz-1: color-mix(in srgb, var(--marca) 18%, transparent);
+  --luz-2: rgb(255 255 255 / 0.04);
+  --brilho: rgb(255 255 255 / 0.1);
+  --halo: color-mix(in srgb, var(--marca) 30%, transparent);
 
-    --sombra-p: 0 1px 2px rgb(0 0 0 / 0.5);
-    --sombra-m: 0 8px 24px -8px rgb(0 0 0 / 0.6);
-    --sombra-g: 0 24px 60px -20px rgb(0 0 0 / 0.7);
-  }
+  --sombra-p: 0 1px 2px rgb(0 0 0 / 0.5);
+  --sombra-m: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --sombra-g: 0 24px 60px -20px rgb(0 0 0 / 0.7);
 }
 
 /* =============================================================================
    Ponte para o Tailwind: cada variável acima vira utilitário.
-   `inline` faz o Tailwind escrever var(--marca) direto na regra, então o tema
-   escuro troca sozinho sem precisar de nenhuma variante `dark:`.
+   `inline` faz o Tailwind escrever var(--marca) direto na regra. A identidade
+   acompanha os tokens, sem depender da preferência de tema do aparelho.
 ============================================================================= */
 
 @theme inline {

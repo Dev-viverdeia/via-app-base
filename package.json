@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "verificar": "node scripts/verificar.mjs",
     "regua": "node scripts/regua.mjs",
-    "ganchos": "node scripts/ganchos.mjs"
+    "ganchos": "node scripts/ganchos.mjs",
+    "test:tema": "node scripts/tema.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",
