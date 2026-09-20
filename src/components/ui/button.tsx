@@ -77,6 +77,7 @@ export function Button({ className, variant, size, ...props }: ButtonProps) {
       type="button"
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
+      data-via-acao={variant ?? "default"}
     />
   );
 }
