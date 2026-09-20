@@ -94,8 +94,8 @@ export default function App() {
           <Route path="*" element={<PaginaNaoEncontrada />} />
         </Routes>
         {/* Avisos do app (sonner). Um só, no topo, e DENTRO do roteador para
-            que um aviso possa levar um <Link>. "system" segue o tema do
-            sistema, igual aos tokens.
+            que um aviso possa levar um <Link>. O app nasce claro; uma mudança
+            de tema pedida pelo dono deve manter os avisos na mesma direção visual.
 
             O sonner traz paleta própria (fundo branco fixo, cinza de borda) e
             desenharia a superfície mais repetida do app fora da identidade —
@@ -108,7 +108,7 @@ export default function App() {
             barra não tem como ganhar). Subir o rodapé dele para 5rem deixa a
             navegação sempre clicável. */}
         <Toaster
-          theme="system"
+          theme="light"
           style={
             {
               "--normal-bg": "var(--superficie)",
