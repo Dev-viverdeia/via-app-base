@@ -93,7 +93,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
     <th role="columnheader" scope="col"
       className={cn(
-        "h-11 px-2.5 text-left align-middle text-sm font-medium text-suave whitespace-nowrap",
+        "h-11 px-2.5 text-left align-middle text-base font-medium text-suave whitespace-nowrap",
         className,
       )}
       {...props}
