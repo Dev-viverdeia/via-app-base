@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { useRef, type ComponentProps } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "../../lib/utils.ts";
@@ -49,14 +49,29 @@ function DialogOverlay({
 export function DialogContent({
   className,
   children,
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Content>) {
+  const origemDoFoco = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Portal>
       <DialogOverlay />
       <DialogPrimitive.Content
+        onOpenAutoFocus={event => {
+          origemDoFoco.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          onOpenAutoFocus?.(event);
+        }}
+        onCloseAutoFocus={event => {
+          onCloseAutoFocus?.(event);
+          // Diálogos controlados podem abrir sem DialogTrigger (botão de cada registro).
+          if (!event.defaultPrevented && origemDoFoco.current?.isConnected) {
+            event.preventDefault();
+            origemDoFoco.current.focus();
+          }
+        }}
         className={cn(
-          "surgir vidro-alto fixed z-50 flex flex-col gap-4 overflow-y-auto p-6 text-tinta",
+          "surgir vidro-alto fixed z-50 flex min-w-0 flex-col gap-4 overflow-y-auto overscroll-contain p-5 text-tinta sm:p-6 [overflow-wrap:anywhere]",
           // Computador: centrado. Celular: folha que sobe do fundo, com a
           // largura toda e o respiro da barra do sistema.
           "sm:top-1/2 sm:left-1/2 sm:w-[calc(100%-2rem)] sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-g sm:max-h-[calc(100dvh-2rem)]",
@@ -66,7 +81,7 @@ export function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 flex size-9 items-center justify-center rounded-total text-suave transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-tinta/5 hover:text-tinta">
+        <DialogPrimitive.Close className="absolute top-3 right-3 flex size-11 items-center justify-center rounded-total text-suave transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-tinta/5 hover:text-tinta">
           <X className="size-4" aria-hidden="true" />
           <span className="sr-only">Fechar</span>
         </DialogPrimitive.Close>
@@ -89,7 +104,7 @@ export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        "mt-2 flex flex-col-reverse flex-wrap gap-2 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}

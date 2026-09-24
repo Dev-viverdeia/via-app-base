@@ -54,7 +54,7 @@ export function CampoDeTexto({
     .join(" ");
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("grid min-w-0 gap-2 [overflow-wrap:anywhere]", className)}>
       <Label htmlFor={idDoCampo}>{rotulo}</Label>
       <Input
         id={idDoCampo}

@@ -22,12 +22,18 @@ import { cn } from "../../lib/utils.ts";
  *     </TableBody>
  *   </Table>
  *
+ * Lista de cadastros no celular: <Table empilharNoCelular aria-label="Clientes">,
+ * <TableCell rotulo="Cidade">…</TableCell>. Use destaque na identidade e nas
+ * ações (linha inteira). O mesmo DOM adapta a tabela; não duplique controles.
+ * Nesse modo o cabeçalho some visualmente no celular: forneça ordenação fora
+ * dele (como em pages/tabela). Não use esse modo em planilha comparativa larga.
  * Lista vazia? Não renderize uma tabela sem linhas: mostre o `<EmptyState />`.
  */
-export function Table({ className, ...props }: ComponentProps<"table">) {
+/** empilharNoCelular exige rotulo em cada TableCell; mantenha ordenação fora do cabeçalho no celular. */
+export function Table({ className, empilharNoCelular = false, ...props }: ComponentProps<"table"> & { empilharNoCelular?: boolean }) {
   return (
     <div
-      className="relative w-full overflow-x-auto"
+      className="relative min-w-0 w-full overflow-x-auto"
       role="region"
       tabIndex={0}
       aria-label="Tabela com rolagem horizontal"
@@ -35,7 +41,8 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
       <table
         // 16px pela mesma razão do botão: célula com quatro palavras ou mais
         // abaixo disso é recusa de desenho na conferência da plataforma.
-        className={cn("w-full caption-bottom text-base text-tinta", className)}
+        role="table"
+        className={cn("w-full caption-bottom text-base text-tinta", empilharNoCelular && "tabela-registros", className)}
         {...props}
       />
     </div>
@@ -44,7 +51,7 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
 
 export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
   return (
-    <thead
+    <thead role="rowgroup"
       className={cn("[&_tr]:border-b [&_tr]:border-borda", className)}
       {...props}
     />
@@ -53,7 +60,7 @@ export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
 
 export function TableBody({ className, ...props }: ComponentProps<"tbody">) {
   return (
-    <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />
+    <tbody role="rowgroup" className={cn("[&_tr:last-child]:border-0", className)} {...props} />
   );
 }
 
@@ -71,7 +78,7 @@ export function TableFooter({ className, ...props }: ComponentProps<"tfoot">) {
 
 export function TableRow({ className, ...props }: ComponentProps<"tr">) {
   return (
-    <tr
+    <tr role="row"
       className={cn(
         "border-b border-borda transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:bg-marca/5 data-[state=selected]:bg-marca/10",
         className,
@@ -84,9 +91,9 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
 /** Célula de cabeçalho (`<th>`): use uma por coluna, dentro do TableHeader. */
 export function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
-    <th
+    <th role="columnheader" scope="col"
       className={cn(
-        "h-11 px-2.5 text-left align-middle text-[11px] font-semibold tracking-[0.08em] text-suave uppercase whitespace-nowrap",
+        "h-11 px-2.5 text-left align-middle text-sm font-medium text-suave whitespace-nowrap",
         className,
       )}
       {...props}
@@ -94,9 +101,12 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
   );
 }
 
-export function TableCell({ className, ...props }: ComponentProps<"td">) {
+export function TableCell({ className, rotulo, destaque, children, ...props }: ComponentProps<"td"> & { rotulo?: string; destaque?: boolean }) {
   return (
-    <td className={cn("px-2.5 py-3.5 align-middle", className)} {...props} />
+    <td role="cell" data-destaque={destaque || undefined} className={cn("px-2.5 py-3.5 align-middle", className)} {...props}>
+      {rotulo ? <span className="rotulo-da-celula">{rotulo}</span> : null}
+      <div className="conteudo-da-celula">{children}</div>
+    </td>
   );
 }
 

@@ -30,6 +30,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Indicadores } from "../../components/ui/indicadores.tsx";
 import { PageHeader } from "../../components/layout/PageHeader.tsx";
 import {
   Card,
@@ -90,32 +91,6 @@ const INDICADORES: ReadonlyArray<{
   },
 ];
 
-/**
- * O tamanho dos números, UM para a fileira inteira.
- *
- * O número é o herói e nasce em 28px, mas o cartão mais estreito do app tem
- * 186px de conteúdo (quatro colunas a 1280) e nesse tamanho só cabem 12
- * caracteres — o décimo terceiro vazava para fora e atropelava o cartão
- * vizinho. Como os algarismos são tabulares, contar caracteres É medir a
- * largura: a escala cai um degrau por vez até 22px, onde ainda cabem 16
- * ("R$ 99.999.999,99"). Nada é cortado e o número continua sendo o maior
- * texto do cartão — o rótulo tem 11px e a variação, 14px.
- *
- * O degrau vale para os quatro de uma vez, ditado pelo valor mais comprido:
- * cartões iguais lado a lado com números de tamanhos diferentes fariam o
- * faturamento do mês parecer menos importante que "37".
- *
- * Ao plugar dados reais, isto se move para dentro do componente junto com
- * `INDICADORES` — o tamanho depende dos valores, e eles passam a chegar
- * depois da primeira pintura.
- */
-const TAMANHO_DOS_VALORES = (() => {
-  const maior = Math.max(...INDICADORES.map((indicador) => indicador.valor.length));
-  if (maior > 14) return "text-[1.375rem]";
-  if (maior > 12) return "text-2xl";
-  return "text-[1.75rem]";
-})();
-
 /** Cada tipo de atividade tem o seu ícone. */
 const ICONE_DA_ATIVIDADE: Record<TipoDeAtividade, LucideIcon> = {
   venda: ShoppingBag,
@@ -137,7 +112,7 @@ function Variacao({ percentual }: { percentual: number }) {
   });
 
   return (
-    <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-sm text-suave">
+    <p className="flex flex-wrap items-center gap-x-1.5 text-base text-suave">
       <span
         className={cn(
           "inline-flex items-center gap-1 font-semibold",
@@ -162,33 +137,7 @@ export default function Inicio() {
       />
 
       {/* --- Os quatro indicadores -------------------------------------- */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {INDICADORES.map((indicador) => (
-          <Card key={indicador.id}>
-            {/* O ícone divide a linha com o RÓTULO, e o número fica com a
-                largura inteira do cartão na linha de baixo. Enquanto os dois
-                eram vizinhos na mesma linha, o número não tinha para onde
-                crescer e passava por cima do ícone. */}
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-[11px] font-semibold tracking-[0.08em] text-suave uppercase">{indicador.rotulo}</p>
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-total bg-marca/10 text-marca">
-                  <indicador.icone className="size-5" aria-hidden="true" />
-                </span>
-              </div>
-              <p
-                className={cn(
-                  "mt-3 leading-none font-semibold tracking-tight text-tinta tabular-nums",
-                  TAMANHO_DOS_VALORES,
-                )}
-              >
-                {indicador.valor}
-              </p>
-              <Variacao percentual={indicador.variacao} />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Indicadores itens={INDICADORES.map(item => ({ ...item, apoio: <Variacao percentual={item.variacao} /> }))} />
 
       <div className="mt-6 grid gap-6 xl:grid-cols-5">
         {/* --- Gráfico de faturamento ----------------------------------- */}

@@ -21,7 +21,7 @@ import { cn } from "../../lib/utils.ts";
 export function Card({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={cn("rounded-g vidro text-tinta", className)}
+      className={cn("min-w-0 rounded-g vidro text-tinta", className)}
       {...props}
     />
   );
