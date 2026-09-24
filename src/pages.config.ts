@@ -14,6 +14,7 @@ import { Kanban, KeyRound, LayoutDashboard, LogIn, UserPlus, Users } from "lucid
 export type PaginaDoApp = {
   id: string;            // = nome da pasta em src/pages/<id>
   titulo: string;        // navbar e <title>
+  tituloNaTela?: string; // texto do h1 quando diferente do menu (até 160 caracteres)
   rota: string;
   icone: LucideIcon;
   pagina: LazyExoticComponent<ComponentType>;
