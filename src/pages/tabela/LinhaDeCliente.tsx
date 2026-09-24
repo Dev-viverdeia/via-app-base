@@ -26,28 +26,28 @@ export function LinhaDeCliente({
 
   return (
     <TableRow>
-      <TableCell>
+      <TableCell destaque>
         <p className="font-medium text-tinta">{cliente.nome}</p>
-        <p className="text-sm text-suave">{cliente.email}</p>
+        <p className="text-base text-suave [overflow-wrap:anywhere]">{cliente.email}</p>
       </TableCell>
-      <TableCell className="whitespace-nowrap text-suave tabular-nums">
+      <TableCell rotulo="WhatsApp" className="whitespace-nowrap text-suave tabular-nums">
         {cliente.whatsapp}
       </TableCell>
-      <TableCell className="whitespace-nowrap text-suave">
+      <TableCell rotulo="Cidade" className="whitespace-nowrap text-suave">
         {cliente.cidade}
       </TableCell>
-      <TableCell>
+      <TableCell rotulo="Status">
         <Badge variant={status.variante}>{status.rotulo}</Badge>
       </TableCell>
-      <TableCell className="whitespace-nowrap text-suave">
+      <TableCell rotulo="Última compra" className="whitespace-nowrap text-suave">
         <time dateTime={cliente.ultimaCompra.toISOString()}>
           {format(cliente.ultimaCompra, "d 'de' MMM", { locale: ptBR })}
         </time>
       </TableCell>
-      <TableCell className="text-right font-medium whitespace-nowrap tabular-nums">
+      <TableCell rotulo="Total comprado" className="text-right font-medium whitespace-nowrap tabular-nums">
         {emReais(cliente.valor)}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell destaque className="text-right">
         <div className="flex justify-end gap-1">
           {/* O nome vai no `aria-label`: doze linhas iguais dariam doze botões
               "Editar" sem dizer editar o quê. */}

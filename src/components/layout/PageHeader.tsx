@@ -17,7 +17,7 @@ type PageHeaderProps = {
 export function PageHeader({ titulo, descricao, acoes }: PageHeaderProps) {
   return (
     <header className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 sm:mb-8">
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1 basis-64 [overflow-wrap:anywhere]">
         <h1 className="text-[1.75rem] leading-tight font-semibold tracking-tight text-balance text-tinta sm:text-[2.5rem]">
           {titulo}
         </h1>
@@ -25,7 +25,7 @@ export function PageHeader({ titulo, descricao, acoes }: PageHeaderProps) {
           <p className="mt-1.5 text-base text-pretty text-suave">{descricao}</p>
         ) : null}
       </div>
-      {acoes ? <div className="flex items-center gap-2">{acoes}</div> : null}
+      {acoes ? <div className="flex max-w-full flex-wrap items-center gap-2 [&>*]:max-w-full [&>*]:whitespace-normal [&>button]:h-auto [&>button]:min-h-11 [&>a]:h-auto [&>a]:min-h-11">{acoes}</div> : null}
     </header>
   );
 }

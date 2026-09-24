@@ -7,6 +7,7 @@
  * `Tabela.tsx`. As regras do formulário ficam aqui embaixo, ao lado dos campos
  * que elas validam.
  */
+import { FormGrid } from "../../components/ui/form-grid.tsx";
 import { Controller } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
@@ -106,15 +107,16 @@ export function DialogDeCliente({
         <form
           noValidate
           onSubmit={form.handleSubmit(aoSalvar)}
-          className="grid gap-4 sm:grid-cols-2"
+          className="min-w-0"
         >
+          <FormGrid>
           <CampoDeTexto
             rotulo="Nome"
             {...form.register("nome")}
             autoComplete="name"
             placeholder="Ana Beatriz Souza"
             erro={erros.nome?.message}
-            className="sm:col-span-2"
+            className="col-span-full"
           />
 
           <CampoDeTexto
@@ -181,12 +183,13 @@ export function DialogDeCliente({
             inputMode="decimal"
             placeholder="0"
             erro={erros.valor?.message}
-            className="sm:col-span-2"
+            className="col-span-full"
           />
 
-          <DialogFooter className="sm:col-span-2">
+          </FormGrid>
+          <DialogFooter className="mt-6">
             <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
+              <Button type="button" variant="outline">Cancelar</Button>
             </DialogClose>
             <Button type="submit">
               {emEdicao ? "Salvar mudanças" : "Cadastrar"}

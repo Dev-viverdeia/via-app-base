@@ -117,7 +117,7 @@ function CabecalhoOrdenavel({
       <button
         type="button"
         onClick={() => aoOrdenar(campo)}
-        className="toque inline-flex h-10 items-center gap-1.5 rounded-p text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta"
+        className="toque inline-flex h-10 items-center gap-1.5 rounded-p text-sm font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta"
       >
         {children}
         <Icone
@@ -281,6 +281,13 @@ export default function Tabela() {
         </p>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2 md:hidden">
+        <Label htmlFor="ordem-clientes">Ordenar por</Label>
+        <select id="ordem-clientes" className="campo min-h-11 min-w-0 flex-1 rounded-m px-3 text-base" value={ordenacao.campo} onChange={e => ordenarPor(e.target.value as CampoDeOrdem)}>
+          <option value="nome">Nome</option><option value="cidade">Cidade</option><option value="status">Status</option><option value="ultimaCompra">Última compra</option><option value="valor">Total comprado</option>
+        </select>
+        <Button variant="outline" size="icon" aria-label={ordenacao.direcao === "asc" ? "Ordenar do maior para o menor" : "Ordenar do menor para o maior"} onClick={() => ordenarPor(ordenacao.campo)}>{ordenacao.direcao === "asc" ? <ArrowUp /> : <ArrowDown />}</Button>
+      </div>
       {/* --- A tabela (ou o vazio) --------------------------------------- */}
       {lista.length === 0 ? (
         clientes.length === 0 ? (
@@ -309,7 +316,7 @@ export default function Tabela() {
         )
       ) : (
         <Card className="p-2 sm:p-3">
-          <Table>
+          <Table empilharNoCelular aria-label="Clientes">
             <TableHeader>
               <TableRow>
                 <CabecalhoOrdenavel
