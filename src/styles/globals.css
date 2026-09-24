@@ -168,6 +168,6 @@
     .tabela-registros tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem 1rem; padding: 1rem 0.75rem; }
     .tabela-registros td { display: block; min-width: 0; padding: 0; text-align: left; white-space: normal; overflow-wrap: anywhere; }
     .tabela-registros td[data-destaque] { grid-column: 1 / -1; }
-    .tabela-registros .rotulo-da-celula { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; line-height: 1.5; color: var(--suave); }
+    .tabela-registros .rotulo-da-celula { display: block; margin-bottom: 0.25rem; font-size: 1rem; line-height: 1.5; color: var(--suave); }
   }
 }

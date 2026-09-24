@@ -117,7 +117,7 @@ function CabecalhoOrdenavel({
       <button
         type="button"
         onClick={() => aoOrdenar(campo)}
-        className="toque inline-flex h-10 items-center gap-1.5 rounded-p text-sm font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta"
+        className="toque inline-flex h-10 items-center gap-1.5 rounded-p text-base font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)] hover:text-tinta"
       >
         {children}
         <Icone
