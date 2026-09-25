@@ -28,7 +28,7 @@ O kit já nasce premium: superfícies de vidro (translúcidas, com aro de luz, s
 - **Status e etiqueta = `Badge`** (`success`, `warning` e `destructive` viram ponto colorido + palavra). Nada de pílula cheia de cor escrita à mão.
 - **Toda tela de app começa com `PageHeader`** (`titulo` e, quando ajudar, uma `descricao` de uma linha). Lista vazia = `EmptyState`.
 - **Texto corrido com 16px ou mais** (`text-base`). `text-sm` só para rótulo e meta curta (até três palavras); `text-xs` só em rótulo em caixa alta com `tracking-[0.08em]`. Nada cortado com `truncate` ou `line-clamp`: o texto quebra a linha.
-- **Título da tela:** um só `<h1>` por página — o do `PageHeader` (numa página standalone, o seu), com 40px no computador e 28px no celular. É o tamanho que o `PageHeader` já dá; não o encolha.
+- **Título da tela:** um só `<h1>` por página — o do `PageHeader` (numa página standalone, o seu), com 40px no computador e 28px no celular. É o tamanho que o `PageHeader` já dá; não o encolha. Menu e título podem diferir: declare o texto visível em `tituloNaTela` no registro de páginas quando não for `titulo`; preserve a chamada do site, sem criar um h1 escondido só para a conferência.
 - **Alvo de toque:** os controles do kit já têm 40px (44 no toque, pela classe `toque`). Não encolha botão nem campo abaixo disso.
 - **Movimento:** só transições curtas (`duration-[var(--t-rapido)] ease-[var(--curva)]`), nada em laço; menus e diálogos entram com a classe `surgir`.
 - **Cores só pelos tokens**, inclusive nas classes de vidro: `bg-vidro`, `bg-vidro-alto` existem para casos raros; o caminho normal é a classe `vidro`.
