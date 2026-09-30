@@ -77,8 +77,8 @@ function PaginaNaoEncontrada() {
 
 export default function App() {
   return (
-    <SessaoDoApp>
-      <BrowserRouter>
+    <BrowserRouter>
+      <SessaoDoApp>
         <Routes>
           {PAGINAS.map((pagina) => (
             <Route
@@ -116,7 +116,7 @@ export default function App() {
           }
           mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
         />
-      </BrowserRouter>
-    </SessaoDoApp>
+      </SessaoDoApp>
+    </BrowserRouter>
   );
 }
