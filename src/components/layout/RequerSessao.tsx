@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../../lib/supabase.ts";
+import { useSessaoDoApp } from "./SessaoDoApp.tsx";
 import { MODO_DEMONSTRACAO } from "../../lib/demonstracao.ts";
 
 /**
@@ -18,33 +16,7 @@ import { MODO_DEMONSTRACAO } from "../../lib/demonstracao.ts";
  */
 export function RequerSessao({ children }: { children: ReactNode }) {
   const local = useLocation();
-  // `undefined` = ainda perguntando ao Supabase (não decida nada nesse meio
-  // tempo, senão o usuário logado pisca no login); `null` = sem sessão.
-  const [sessao, setSessao] = useState<Session | null | undefined>(undefined);
-
-  useEffect(() => {
-    // Em modo de demonstração não há sessão para ouvir.
-    if (MODO_DEMONSTRACAO) return;
-    let vivo = true;
-
-    // A sessão guardada no navegador. Sem nenhuma salva, isto responde na
-    // hora e sem rede.
-    void supabase.auth.getSession().then(({ data }) => {
-      if (vivo) setSessao(data.session);
-    });
-
-    // Entrar, sair ou renovar o token muda a resposta desta guarda na hora.
-    const { data: assinatura } = supabase.auth.onAuthStateChange(
-      (_evento, sessaoAtual) => {
-        if (vivo) setSessao(sessaoAtual);
-      },
-    );
-
-    return () => {
-      vivo = false;
-      assinatura.subscription.unsubscribe();
-    };
-  }, []);
+  const sessao = useSessaoDoApp();
 
   // Modo de demonstração (só no preview, com o cookie da plataforma): a
   // conferência automática entra sem conta e vê as telas com os dados de
