@@ -87,6 +87,7 @@ A plataforma confere o app num navegador de verdade, e o passo só acha o que EX
 
 ## Dados e formulários
 
+- **Contas separadas na interface:** `SessaoDoApp` mantém consultas e rascunhos por identidade, inclusive ao sair numa rota pública; `RequerSessao` lê essa mesma sessão. Preserve os dois. Renovar o token mantém o trabalho da mesma pessoa. RLS continua obrigatória; stores e dados privados persistentes também precisam ser separados por conta.
 - **Leitura de dados: `@tanstack/react-query`** (`useQuery`), montada DENTRO do componente, com estados de carregando (`Skeleton`) e erro. As telas do template usam dados demo de `src/data/demo/` montados na carga do módulo — ao plugar dados reais, siga o cabeçalho-doc da tela: ele diz exatamente o que mover para dentro do componente.
 - **Todo formulário: `react-hook-form` + `zod`**, mensagens do schema em pt-BR. Reuse os arrays de opções nos enums (`z.enum(STATUS)`) para uma lista só governar formulário e dados.
 - Dinheiro formata com `emReais()` de `src/lib/utils.ts`; datas com `date-fns` + locale `ptBR`; ids de demo com `novoId()`.

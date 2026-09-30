@@ -1,16 +1,12 @@
 import { Suspense } from "react";
 import type { CSSProperties } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SessaoDoApp } from "./components/layout/SessaoDoApp.tsx";
 import { Toaster } from "sonner";
 import { AppShell, NOME_DO_APP } from "./components/layout/AppShell.tsx";
 import { RequerSessao } from "./components/layout/RequerSessao.tsx";
 import { buttonVariants } from "./components/ui/button.tsx";
 import { PAGINAS, type PaginaDoApp } from "./pages.config.ts";
-
-// Um cliente para o app inteiro. Fica fora do componente para não nascer de
-// novo a cada render (isso jogaria o cache das consultas fora).
-const queryClient = new QueryClient();
 
 /**
  * Uma entrada do registro virando tela.
@@ -81,8 +77,8 @@ function PaginaNaoEncontrada() {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <SessaoDoApp>
         <Routes>
           {PAGINAS.map((pagina) => (
             <Route
@@ -120,7 +116,7 @@ export default function App() {
           }
           mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 5rem)" }}
         />
-      </BrowserRouter>
-    </QueryClientProvider>
+      </SessaoDoApp>
+    </BrowserRouter>
   );
 }
