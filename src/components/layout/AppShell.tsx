@@ -1,10 +1,11 @@
-import type { ReactNode } from "react";
-import { NavLink } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { matchPath, NavLink, useLocation } from "react-router-dom";
+import { Check, Grid2X2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { PAGINAS } from "../../pages.config.ts";
 import { supabase } from "../../lib/supabase.ts";
 import { cn } from "../../lib/utils.ts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog.tsx";
 
 /**
  * Nome do app exibido na marca. Renomear o app = trocar aqui
@@ -23,6 +24,10 @@ export const LOGO_DO_APP: string | null = null;
 
 /** A navegação é o registro de páginas: nada de menu escrito na mão. */
 const ITENS_DA_NAVEGACAO = PAGINAS.filter((pagina) => pagina.naNavbar);
+// A ordem do registro define os acessos principais. Três destinos deixam os
+// nomes legíveis também em 320px; todas as áreas continuam no menu Mais.
+const ITENS_PRINCIPAIS = ITENS_DA_NAVEGACAO.slice(0, 3);
+const ITENS_ADICIONAIS = ITENS_DA_NAVEGACAO.slice(3);
 
 /**
  * Encerra a sessão. Não navegamos daqui: quem observa a sessão é o
@@ -56,8 +61,37 @@ const ITEM_LATERAL =
  * todos dos tokens; o vidro, de `globals.css`.
  */
 export function AppShell({ children }: { children: ReactNode }) {
+  const [menuAberto, setMenuAberto] = useState(false);
+  const { pathname } = useLocation();
+  const moldura = useRef<HTMLDivElement>(null);
+  const barra = useRef<HTMLElement>(null);
+  const painel = useRef<HTMLDivElement>(null);
+  const areaAdicional = ITENS_ADICIONAIS.find(pagina =>
+    matchPath({ path: pagina.rota, end: pagina.rota === "/" }, pathname),
+  );
+
+  useEffect(() => { setMenuAberto(false); }, [pathname]);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 48rem)");
+    const fecharNoDesktop = () => { if (desktop.matches) setMenuAberto(false); };
+    desktop.addEventListener("change", fecharNoDesktop);
+    const medir = () => {
+      if (!barra.current || !moldura.current) return;
+      const altura = barra.current.getBoundingClientRect().height;
+      const base = Number.parseFloat(getComputedStyle(barra.current).bottom) || 0;
+      // Inclui o vidro, a área segura do aparelho e 12px de respiro. A mesma
+      // medida serve ao conteúdo e ao campo de conversa de qualquer página.
+      moldura.current.style.setProperty("--app-bottom-inset", `${altura ? Math.ceil(altura + base + 12) : 0}px`);
+    };
+    const observer = new ResizeObserver(medir);
+    if (barra.current) observer.observe(barra.current);
+    medir();
+    window.addEventListener("resize", medir);
+    return () => { observer.disconnect(); window.removeEventListener("resize", medir); desktop.removeEventListener("change", fecharNoDesktop); };
+  }, []);
+
   return (
-    <div className="min-h-dvh">
+    <div ref={moldura} className="app-shell min-h-dvh">
       {/* --- Desktop: barra lateral de vidro, solta da borda ------------- */}
       <aside className="fixed inset-y-3 left-3 z-30 hidden w-60 flex-col rounded-g vidro-alto md:flex">
         {/* A marca. O logo entra NO LUGAR do nome, não ao lado: logo de
@@ -97,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               }
             >
               <pagina.icone className="size-5 shrink-0" aria-hidden="true" />
-              {pagina.titulo}
+              <span className="min-w-0 [overflow-wrap:anywhere]">{pagina.titulo}</span>
             </NavLink>
           ))}
         </nav>
@@ -131,45 +165,79 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </header>
         ) : null}
-        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-32 md:px-8 md:py-10">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-[var(--app-bottom-inset)] md:px-8 md:py-10">
           {children}
         </main>
       </div>
 
       {/* --- Celular: barra inferior de vidro ----------------------------- */}
+      <Dialog open={menuAberto} onOpenChange={setMenuAberto}>
       <nav
+        ref={barra}
         aria-label="Navegação principal"
-        className="fixed inset-x-3 bottom-3 z-30 flex rounded-total vidro-alto p-1 md:hidden"
-        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
+        className="app-mobile-nav fixed inset-x-3 bottom-[calc(.75rem+env(safe-area-inset-bottom,0px))] z-30 mx-auto flex max-w-lg gap-1 rounded-g vidro-alto p-1 md:hidden"
       >
-        {ITENS_DA_NAVEGACAO.map((pagina) => (
+        {ITENS_PRINCIPAIS.map((pagina) => (
           <NavLink
             key={pagina.id}
             to={pagina.rota}
             end={pagina.rota === "/"}
+            title={pagina.titulo}
             className={({ isActive }) =>
               cn(
-                "flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-total py-1.5 text-[11px] font-medium transition-colors duration-[var(--t-rapido)] ease-[var(--curva)]",
+                "app-mobile-item",
                 isActive ? "bg-marca/10 font-semibold text-tinta [&>svg]:text-marca" : "text-suave",
               )
             }
           >
             <pagina.icone className="size-5 shrink-0" aria-hidden="true" />
-            {pagina.titulo}
+            <span className="line-clamp-2 max-w-full [overflow-wrap:anywhere]">{pagina.titulo}</span>
           </NavLink>
         ))}
 
-        {/* No celular a saída é o último item da barra, com a mesma linguagem
-            visual dos outros — só que ela não leva a lugar nenhum. */}
+        <DialogTrigger asChild>
         <button
           type="button"
-          onClick={sair}
-          className="flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-total py-1.5 text-[11px] font-medium text-suave"
+          data-via-navigation-trigger
+          aria-label={areaAdicional ? `Mais, área atual: ${areaAdicional.titulo}` : "Mais"}
+          className={cn("app-mobile-item", areaAdicional ? "bg-marca/10 font-semibold text-tinta [&>svg]:text-marca" : "text-suave")}
         >
-          <LogOut className="size-5 shrink-0" aria-hidden="true" />
-          Sair
+          <Grid2X2 className="size-5 shrink-0" aria-hidden="true" />
+          <span>Mais</span>
         </button>
+        </DialogTrigger>
       </nav>
+      <DialogContent ref={painel} aria-describedby={undefined} className="gap-3"
+        onOpenAutoFocus={event => {
+          event.preventDefault();
+          (painel.current?.querySelector<HTMLElement>('a[aria-current="page"]') ?? painel.current?.querySelector<HTMLElement>('a, button'))?.focus();
+        }}>
+        <DialogHeader>
+          <p className="text-sm text-suave">{NOME_DO_APP}</p>
+          <DialogTitle>Todas as áreas</DialogTitle>
+        </DialogHeader>
+        <nav aria-label="Navegação principal" className="flex flex-col gap-1">
+          {ITENS_DA_NAVEGACAO.map(pagina => (
+            <NavLink key={pagina.id} to={pagina.rota} end={pagina.rota === "/"}
+              onClick={() => setMenuAberto(false)}
+              className={({ isActive }) => cn(ITEM_LATERAL, "min-h-12", isActive ? "bg-marca/10 font-semibold text-tinta" : "text-suave hover:bg-tinta/5 hover:text-tinta")}
+            >
+              {({ isActive }) => <>
+                <pagina.icone className={cn("size-5 shrink-0", isActive && "text-marca")} aria-hidden="true" />
+                <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{pagina.titulo}</span>
+                {isActive && <Check className="size-4 shrink-0 text-marca" aria-hidden="true" />}
+              </>}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="border-t border-borda pt-3">
+          <button type="button" onClick={() => { setMenuAberto(false); void sair(); }}
+            className={cn(ITEM_LATERAL, "min-h-12 w-full text-suave hover:bg-tinta/5 hover:text-tinta")}>
+            <LogOut className="size-5 shrink-0" aria-hidden="true" />Sair da conta
+          </button>
+        </div>
+      </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -56,7 +56,8 @@ O `index.html` já traz `description`, `og:title`, `og:description`, `og:image` 
 
 - **Cada entrada ocupa exatamente uma linha.** Nunca quebre uma entrada em várias linhas, nunca ponha duas na mesma. A plataforma corta telas removendo linhas deste bloco — entrada fora do padrão quebra esse mecanismo.
 - `protegida: true` = a página exige login e renderiza dentro do AppShell (sidebar/barra). `protegida: false` = página pública e **standalone** (sem shell — ela desenha o próprio `<main>`, como `login` e `captacao`).
-- `naNavbar: false` tira a página da navegação sem tirá-la do ar.
+- `naNavbar: false` tira a página da navegação sem tirá-la do ar. A ordem das páginas visíveis define os três acessos principais no celular; **Mais** reúne todas as áreas. Priorize as tarefas frequentes do negócio. Use `titulo` curto e claro (por exemplo, Clientes) e `tituloNaTela` para a chamada completa; não crie outro registro de menu. Preserve NavLink, o marcador `data-via-navigation-trigger` e as permissões existentes.
+- O AppShell mede a barra móvel em `--app-bottom-inset`, incluindo a área segura; no desktop vale zero. Componentes de conversa com `bottomInset` usam `"var(--app-bottom-inset, 0px)"`. Em apps antigos ou layouts próprios, confira o espaço real antes de adaptar. Nunca esconda a navegação para caber o campo de mensagem.
 - **PASTA nova dentro de `src/pages/` é sempre uma página** — o verificador cobra a bijeção pasta ↔ registro e acusa pasta órfã. Já **ARQUIVO auxiliar de uma tela** pode morar ao lado do componente dela (é o que `src/pages/tabela/` faz) ou em `src/lib/` quando serve a mais de uma tela.
 
 Depois de mexer no registro, no `package.json` ou em `CLAUDE.md`, o dono pode rodar `npm run verificar` — mensagens de erro dizem o que quebrou e como consertar. Não edite `scripts/verificar.mjs`.
