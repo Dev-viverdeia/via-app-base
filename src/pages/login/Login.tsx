@@ -29,6 +29,8 @@ import {
   mensagemDoErro,
 } from "../../lib/erros-de-acesso.ts";
 import { supabase } from "../../lib/supabase.ts";
+import { destinoAposLogin } from "../../lib/destino-apos-login.ts";
+import { PAGINAS } from "../../pages.config.ts";
 
 /* -------------------------------------------------------------------------
    Regras dos formulários. As mensagens são as que o usuário lê, então elas
@@ -62,30 +64,7 @@ const RESPOSTA_DO_PEDIDO =
   "Se este e-mail tiver uma conta, você vai receber um link para criar uma senha nova.";
 
 /**
- * De onde o visitante veio antes de bater na guarda de sessão. Só aceitamos
- * caminho de dentro do app — um endereço de fora aqui seria um convite a
- * redirecionar o usuário para longe depois do login.
- */
-function rotaDeVolta(estado: unknown): string {
-  const de = (estado as { de?: unknown } | null)?.de;
-  // Exigir "/" no começo já barra endereço absoluto ("https://…", "mailto:…").
-  if (typeof de !== "string" || !de.startsWith("/")) return "/";
-
-  // Quem decide se o destino continua dentro de casa é o próprio parser de
-  // URL do navegador, não um teste de texto: "/\evil.com" passaria por
-  // qualquer comparação de prefixo (o parser trata a barra invertida como
-  // barra) e levaria a pessoa para fora depois do login.
-  try {
-    return new URL(de, window.location.origin).origin === window.location.origin
-      ? de
-      : "/";
-  } catch {
-    return "/";
-  }
-}
-
-/**
- * Tela de entrada — a única página pública do template.
+ * Tela de entrada — uma página pública do template.
  *
  * Ela é `protegida: false` no registro, então o `App.tsx` a renderiza SEM a
  * moldura do app: cartão sozinho, centrado sobre o fundo. As duas abas usam o
@@ -95,7 +74,7 @@ function rotaDeVolta(estado: unknown): string {
 export default function Login() {
   const navegar = useNavigate();
   const local = useLocation();
-  const destino = rotaDeVolta(local.state);
+  const destino = destinoAposLogin(local.state, PAGINAS, window.location.origin);
 
   // Erro do servidor (o do campo quem mostra é o zod, logo abaixo do campo).
   const [erroEntrar, setErroEntrar] = useState<string | null>(null);
